@@ -40,7 +40,8 @@
               :key="index"
               :class="['message-bubble', message.sender === 'user' ? 'user-message' : 'assistant-message']"
             >
-              <div class="message-content">{{ renderMessageContent(message).text }}</div>
+              <div class="message-content" v-if="message.sender === 'user'">{{ renderMessageContent(message).text }}</div>
+              <div class="message-content markdown-body" v-else v-html="renderMessageContent(message).html"></div>
               <url-preview 
                 v-if="renderMessageContent(message).hasUrl" 
                 :url="renderMessageContent(message).url"
@@ -200,13 +201,33 @@ import { mapGetters } from 'vuex';
 import { useSocket } from '@/composables/useSocket';
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue';
 import UrlPreview from '@/components/chat/UrlPreview.vue';
+// Import marked pour le support Markdown
+import { marked } from 'marked';
+import 'highlight.js/styles/github.css';
+import hljs from 'highlight.js';
+
+// Configuration de marked pour utiliser highlight.js
+marked.setOptions({
+  highlight: function(code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(code, { language: lang }).value;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return hljs.highlightAuto(code).value;
+  },
+  breaks: true,
+  gfm: true
+});
 
 export default {
   name: 'Chat',
   components: {
     LoadingOverlay,
     UrlPreview
-  },    data() {
+  },data() {
     // Sử dụng composable useSocket để truy cập các phương thức socket
     const socket = useSocket();
     
@@ -313,19 +334,24 @@ export default {
       const urlRegex = /(https?:\/\/[^\s]+)/g;
       return text.match(urlRegex) || [];
     },
-    
-    // Function to render message content with URL detection
+      // Function to render message content with URL detection and Markdown support
     renderMessageContent(message) {
       const urls = this.extractUrls(message.content);
+      
+      // Parse content with Markdown
+      const htmlContent = marked.parse(message.content);
+      
       if (urls.length > 0) {
         return {
           text: message.content,
+          html: htmlContent,
           hasUrl: true,
           url: urls[0] // For simplicity, we'll just show preview for the first URL
         };
       }
       return {
         text: message.content,
+        html: htmlContent,
         hasUrl: false
       };
     },

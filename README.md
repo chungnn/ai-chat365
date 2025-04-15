@@ -74,5 +74,7 @@ Below are some screenshots of the AI Helpdesk Support System in action:
 
 ![Chat Interface](screenshots/sc1.JPG)
 
+![MGMT Chat Interface](screenshots/sc2.JPG)
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

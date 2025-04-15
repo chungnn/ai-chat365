@@ -53,15 +53,13 @@
               >
                 <div class="message-sender">
                   {{ message.role }}
-                </div>
-                <div class="message-bubble">
-                  <div class="message-content">
-                    <template v-if="hasUrl(message.content)">
-                      <div v-html="formatMessageWithoutUrl(message.content)"></div>
+                </div>                <div class="message-bubble">
+                  <div class="message-content markdown-content">
+                    <template v-if="hasUrl(message.content)">                      <div v-html="renderMarkdown(formatMessageWithoutUrl(message.content))"></div>
                       <url-preview :url="extractUrl(message.content)"></url-preview>
                     </template>
                     <template v-else>
-                      {{ message.content }}
+                      <div v-html="renderMarkdown(message.content)"></div>
                     </template>
                   </div>
                   <div class="message-meta">
@@ -229,6 +227,7 @@ import { ref, computed, onMounted, onUpdated, onUnmounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
 import UrlPreview from '@/components/common/UrlPreview.vue';
+import { parseMarkdown } from '@/utils/markdown';
 
 export default {
   name: 'ChatDetailView',
@@ -353,10 +352,13 @@ export default {
       const matches = text.match(urlRegex);
       return matches ? matches[0] : '';
     };
-    
-    const formatMessageWithoutUrl = (text) => {
+      const formatMessageWithoutUrl = (text) => {
       if (!text) return '';
       return text.replace(/(https?:\/\/[^\s]+)/g, '');
+    };
+      // Parse markdown content - wrapper for the imported function
+    const renderMarkdown = (text) => {
+      return parseMarkdown(text || '');
     };
     
     // Scroll to bottom of messages container
@@ -745,6 +747,9 @@ export default {
       hasUrl,
       extractUrl,
       formatMessageWithoutUrl,
+      
+      //format markdown content
+      renderMarkdown,
       // Tag-related data and methods
       selectedTags,
       allTags,
@@ -1158,6 +1163,79 @@ export default {
 
 .message-content {
   word-wrap: break-word;
+}
+
+/* Markdown content styles */
+.markdown-content {
+  line-height: 1;
+}
+
+.markdown-content code {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.markdown-content pre {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  display: block;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.markdown-content h1 {
+  font-size: 1.5em;
+}
+
+.markdown-content h2 {
+  font-size: 1.3em;
+}
+
+.markdown-content h3 {
+  font-size: 1.1em;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.markdown-content li {
+  margin-bottom: 2px;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+  padding-left: 20px;
+  margin: 4px 0;
+}
+
+.markdown-content a {
+  color: #4a6cf7;
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline;
 }
 
 .message-meta {
