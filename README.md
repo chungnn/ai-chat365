@@ -2,6 +2,8 @@
 
 An open source AI-based helpdesk support system with a focus on chat functionality, designed to provide intelligent customer support with human agent integration.
 
+# Give me a ⭐ star on [GitHub repo](https://github.com/chungnn/ai-chat365) to keep improving this project! 💖
+
 ## Features
 - AI-powered chat support for customer inquiries
 - Live agent handoff when AI can't resolve issues
@@ -71,7 +73,6 @@ This is an open source project and contributions are welcome! Please read the [C
 Below are some screenshots of the AI Helpdesk Support System in action:
 
 ![Chat Interface](screenshots/sc1.JPG)
-<img width="500px" src="https://raw.githubusercontent.com/chungnn/ai-chat365/master/screenshots/sc1.JPG">
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
