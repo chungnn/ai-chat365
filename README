@@ -67,5 +67,10 @@ Each component has its own configuration needs. Refer to the README files in eac
 ## Contributing
 This is an open source project and contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
 
+## Screenshots
+Below are some screenshots of the AI Helpdesk Support System in action:
+
+![Chat Interface](screenshots/sc1.JPG)
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -71,7 +71,7 @@ exports.initSession = async (req, res) => {
       ticketId: ticketId,
       status: 'open',
       priority: 'medium',
-      category: 'general',
+      category: null,
       userInfo: {
         name: name || '',
         email: email || '',
