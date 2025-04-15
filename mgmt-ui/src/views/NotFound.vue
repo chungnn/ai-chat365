@@ -1,0 +1,63 @@
+<template>
+  <div class="not-found">
+    <div class="not-found-content">
+      <h1>404</h1>
+      <h2>Page Not Found</h2>
+      <p>The page you are looking for does not exist or has been moved.</p>
+      <router-link
+        to="/"
+        class="btn btn-primary"
+      >
+        Back to Dashboard
+      </router-link>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'NotFoundView'
+}
+</script>
+
+<style scoped>
+.not-found {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  padding: 20px;
+}
+
+.not-found-content {
+  text-align: center;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 60px 40px;
+  max-width: 500px;
+}
+
+h1 {
+  font-size: 80px;
+  margin: 0;
+  color: #4a6cf7;
+}
+
+h2 {
+  font-size: 28px;
+  margin: 0 0 20px 0;
+  color: #1d2537;
+}
+
+p {
+  margin-bottom: 30px;
+  color: #6b7a99;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+}
+</style>

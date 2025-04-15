@@ -1,0 +1,36 @@
+# AI Helpdesk Support System
+
+This repository is designed for managing and developing an AI-based helpdesk support system with a focus on chat functionality. Below is an overview of the repository:
+
+## Features
+- AI-powered chat support for customer inquiries
+- Live agent handoff when AI can't resolve issues
+- Ticket management and tracking system
+- Knowledge base integration for accurate responses
+- Analytics and reporting on support metrics
+
+## Structure
+- **/src**: Contains the source code for the project.
+- **/data**: Includes datasets used for training and testing AI models.
+- **/docs**: Documentation and guides for using and contributing to the project.
+- **/tests**: Unit and integration tests for ensuring code quality.
+
+## Getting Started
+1. Clone the repository:
+    ```
+    git clone https://github.com/chungnn/ai-chat365
+    ```
+2. Install dependencies:
+    ```
+    npm install
+    ```
+3. Run the application:
+    ```
+    npm start
+    ```
+
+## Contributing
+Contributions are welcome! Please follow the guidelines in the `CONTRIBUTING.md` file.
+
+## License
+This project is licensed under the MIT License. See the `LICENSE` file for details.

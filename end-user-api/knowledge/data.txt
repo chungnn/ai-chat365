@@ -1,0 +1,90 @@
+# THÔNG TIN DỊCH VỤ HỖ TRỢ KỸ THUẬT
+
+## Dịch vụ hỗ trợ của chúng tôi
+Trung tâm hỗ trợ khách hàng cung cấp các dịch vụ hỗ trợ kỹ thuật toàn diện 24/7. Đội ngũ chuyên viên hỗ trợ giàu kinh nghiệm luôn sẵn sàng giải quyết mọi vấn đề kỹ thuật và cung cấp hướng dẫn chi tiết cho khách hàng.
+
+## Các loại hỗ trợ chính
+- Hỗ trợ kỹ thuật: Giải quyết các vấn đề về phần cứng, phần mềm và kết nối
+- Tư vấn giải pháp: Đề xuất giải pháp phù hợp với nhu cầu cụ thể của khách hàng
+- Hỗ trợ nâng cấp: Hướng dẫn quy trình nâng cấp và cập nhật hệ thống
+- Khắc phục sự cố: Xử lý nhanh chóng các sự cố phát sinh
+
+# HƯỚNG DẪN SỬ DỤNG DỊCH VỤ
+
+## Quy trình tiếp nhận yêu cầu hỗ trợ
+1. Khách hàng gửi yêu cầu hỗ trợ qua hệ thống chat hoặc biểu mẫu liên hệ
+2. Hệ thống tự động phân loại và xác định mức độ ưu tiên của yêu cầu
+3. Yêu cầu được chuyển đến chuyên viên hỗ trợ phù hợp
+4. Khách hàng nhận được phản hồi ban đầu trong vòng 15-30 phút
+5. Vấn đề được giải quyết và khách hàng xác nhận kết quả
+
+## Mức độ ưu tiên và thời gian phản hồi
+- Cao: Phản hồi trong vòng 30 phút, giải quyết trong 4-8 giờ
+- Trung bình: Phản hồi trong vòng 2 giờ, giải quyết trong 24 giờ
+- Thấp: Phản hồi trong vòng 24 giờ, giải quyết trong 48 giờ
+
+# GIẢI PHÁP CHO CÁC VẤN ĐỀ PHỔ BIẾN
+
+## Vấn đề kết nối internet
+1. Kiểm tra kết nối vật lý: dây cáp, cổng kết nối
+2. Khởi động lại modem/router: ngắt nguồn 30 giây, sau đó bật lại
+3. Kiểm tra cài đặt mạng: địa chỉ IP, DNS, proxy
+4. Vô hiệu hóa tạm thời tường lửa hoặc phần mềm diệt virus
+5. Liên hệ nhà cung cấp dịch vụ internet nếu vấn đề vẫn còn
+
+## Sự cố phần mềm
+1. Cập nhật phần mềm lên phiên bản mới nhất
+2. Xóa bộ nhớ cache và dữ liệu tạm
+3. Khởi động lại ứng dụng hoặc hệ thống
+4. Gỡ cài đặt và cài đặt lại phần mềm
+5. Kiểm tra xung đột với phần mềm khác
+
+## Vấn đề phần cứng
+1. Kiểm tra kết nối của thiết bị
+2. Cập nhật driver thiết bị
+3. Kiểm tra tương thích phần cứng
+4. Chạy công cụ chẩn đoán
+5. Liên hệ bộ phận sửa chữa phần cứng
+
+# CHÍNH SÁCH HỖ TRỢ
+
+## Thời gian hỗ trợ
+- Hỗ trợ trực tuyến: 24/7, tất cả các ngày trong năm
+- Hỗ trợ qua điện thoại: Thứ 2 - Thứ 6: 8:00 - 20:00, Thứ 7: 8:00 - 12:00
+- Hỗ trợ tại chỗ: Theo lịch hẹn, trong giờ làm việc
+
+## Cam kết chất lượng dịch vụ
+1. Thời gian phản hồi nhanh chóng
+2. Đội ngũ chuyên viên được đào tạo chuyên sâu
+3. Tỷ lệ giải quyết vấn đề từ lần đầu tiên cao
+4. Theo dõi và cập nhật tiến độ xử lý yêu cầu
+5. Đảm bảo sự hài lòng của khách hàng
+
+# CÁC CÂU HỎI THƯỜNG GẶP
+
+## Tài khoản và bảo mật
+1. Làm thế nào để đặt lại mật khẩu?
+   - Sử dụng tính năng "Quên mật khẩu" trên trang đăng nhập
+   - Xác thực qua email hoặc số điện thoại đã đăng ký
+   - Tạo mật khẩu mới theo hướng dẫn
+
+2. Làm cách nào để tăng cường bảo mật tài khoản?
+   - Sử dụng mật khẩu mạnh, ít nhất 8 ký tự với chữ hoa, chữ thường, số và ký tự đặc biệt
+   - Bật xác thực hai yếu tố
+   - Cập nhật thông tin liên hệ
+   - Không chia sẻ thông tin đăng nhập
+
+## Thanh toán và đăng ký dịch vụ
+1. Các phương thức thanh toán được chấp nhận?
+   - Thẻ tín dụng/ghi nợ (Visa, MasterCard)
+   - Chuyển khoản ngân hàng
+   - Ví điện tử (MoMo, ZaloPay, VNPay)
+
+2. Quy trình đăng ký và gia hạn dịch vụ?
+   - Chọn gói dịch vụ phù hợp
+   - Điền thông tin thanh toán
+   - Xác nhận đơn hàng
+   - Nhận email xác nhận đăng ký thành công
+
+# CÁC CÂU HỎI THƯỜNG GẶP
+

@@ -1,0 +1,53 @@
+{
+  "name": "end-user-api",
+  "version": "1.0.0",
+  "description": "Express.js and MongoDB backend for customer-facing services",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node src/seeder/seeder.js",
+    "seed:destroy": "node src/seeder/seeder.js -d"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "api",
+    "backend",
+    "chat",
+    "ai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "@socket.io/redis-adapter": "^8.3.0",    "axios": "^1.8.4",
+    "bcryptjs": "^2.4.3",
+    "cheerio": "^1.0.0-rc.12",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.9.0",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.1",
+    "moment": "^2.29.4",
+    "mongoose": "^7.5.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.10.0",
+    "openai": "^4.0.0",
+    "redis": "^4.7.0",
+    "socket.io": "^4.7.2",
+    "uuid": "^9.0.0",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.47.0",
+    "faker": "^5.5.3",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.2"
+  }
+}

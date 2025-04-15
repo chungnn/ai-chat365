@@ -1,0 +1,40 @@
+{
+  "name": "end-user-ui",
+  "version": "1.0.0",
+  "description": "Vue.js frontend for customer-facing services including AI chat and shopping cart",
+  "main": "index.js",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },  "dependencies": {
+    "axios": "^1.5.0",
+    "core-js": "^3.32.1",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4",
+    "vuex": "^4.1.0",
+    "vuetify": "^3.3.15",
+    "socket.io-client": "^4.7.2",
+    "vee-validate": "^4.11.3",
+    "moment": "^2.29.4"
+  },  "devDependencies": {
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-router": "^5.0.8",
+    "@vue/cli-plugin-vuex": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "@vue/compiler-sfc": "^3.3.4",
+    "eslint": "^8.47.0",
+    "eslint-plugin-vue": "^9.17.0",
+    "sass": "^1.66.1",
+    "sass-loader": "^13.3.2"
+  },
+  "keywords": [
+    "vue",
+    "frontend",
+    "chat",
+    "ai",
+    "ecommerce"
+  ],
+  "author": "",
+  "license": "ISC"
+}
