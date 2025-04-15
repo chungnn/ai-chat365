@@ -63,9 +63,12 @@ exports.initSession = async (req, res) => {
       source: req.body.source || 'website',
       referrer: req.headers.referer || '',
       isAuthenticated: req.user ? true : false
-    });
-      // Create a new chat session
+    });    // Create a new chat session
     const ticketId = 'HD-' + Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit ticket ID
+    
+    // Get translated greeting message
+    const { t } = require('../utils/translation');
+    const greeting = t(req, 'chat.greeting', { ticketId });
     chat = new Chat({
       sessionId,
       ticketId: ticketId,
@@ -84,7 +87,7 @@ exports.initSession = async (req, res) => {
         },
         {
           role: 'assistant',
-          content: 'Xin chào! Tôi là trợ lý AI của bộ phận hỗ trợ kỹ thuật. Tôi có thể giúp bạn giải quyết các vấn đề kỹ thuật hoặc chuyển yêu cầu của bạn đến đội ngũ hỗ trợ của chúng tôi. Mã ticket hỗ trợ của bạn là ' + ticketId + '. Bạn cần hỗ trợ vấn đề gì?'
+          content: greeting
         }
       ],
       metadata: {
@@ -270,19 +273,32 @@ exports.sendMessage = async (req, res) => {
     //   productSuggestions = await aiService.getRecommendedProducts(message, chat.metadata.topics);
     //   console.log('[SOCKET DEBUG] Product recommendations count:', productSuggestions.length);
     // }
-    
-    // Ensure messagesForAI is an array before passing it to aiService
+      // Ensure messagesForAI is an array before passing it to aiService
     if (!Array.isArray(messagesForAI)) {
       messagesForAI = [];
       console.error('[SOCKET DEBUG] Error: messagesForAI is not an array. Creating empty array instead.');
     }
-    
-
     console.log('[SOCKET DEBUG] Messages for AI:', messagesForAI);
 
-    // Generate AI response using Gemini
+    // Lấy ngôn ngữ từ session nếu có, nếu không thì sử dụng req.locale hoặc mặc định là 'en'
+    const userLocale = (req.session && req.session.locale) || req.locale || 'en';
+    console.log(`[SOCKET DEBUG] Using locale for AI response: ${userLocale}`);
+
+    // Thêm chỉ dẫn về ngôn ngữ cần sử dụng để trả lời
+    const languageInstruction = {
+      en: "Please respond in English.",
+      vi: "Vui lòng trả lời bằng tiếng Việt."
+    };
+
+    // Thêm tin nhắn hệ thống chỉ định ngôn ngữ phản hồi
+    messagesForAI.push({
+      role: 'system',
+      content: `${languageInstruction[userLocale] || languageInstruction.en} The user's preferred language is ${userLocale}.`
+    });
+
+    // Generate AI response using Gemini with user's locale
     console.log('[SOCKET DEBUG] Generating AI response from messages using Gemini');
-    const aiResponse = await aiService.generateResponse(messagesForAI);
+    const aiResponse = await aiService.generateResponse(messagesForAI, { locale: userLocale });
     console.log('[SOCKET DEBUG] AI response generated successfully with Gemini');
     
     // Add AI response to chat history
@@ -290,14 +306,14 @@ exports.sendMessage = async (req, res) => {
       role: 'assistant',
       content: aiResponse
     });
-    
-    // Check if we should suggest human transfer
+      // Check if we should suggest human transfer
     console.log('[SOCKET DEBUG] Checking if should transfer to human');
     const shouldSuggestHumanTransfer = await aiService.shouldTransferToHuman(
       chat.messages.map(msg => ({
         role: msg.role,
         content: msg.content
-      }))
+      })),
+      req.locale
     );
     console.log('[SOCKET DEBUG] Should transfer to human:', shouldSuggestHumanTransfer);
     

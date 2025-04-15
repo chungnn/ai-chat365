@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
+const languageMiddleware = require('../middleware/language');
 
 /**
  * Initialize the Express application with required middleware
@@ -15,6 +16,9 @@ const initializeApp = () => {
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  
+  // Apply language detection middleware globally
+  app.use(languageMiddleware);
 
   return app;
 };
@@ -48,6 +52,7 @@ const configureRoutes = (app) => {  // Routes  app.use('/api/auth', require('../
   app.use('/api/chat', require('../routes/chatRoutes'));
   app.use('/api/url-metadata', require('../routes/urlMetadataRoutes'));
   app.use('/api/ticket', require('../routes/ticketRoutes'));
+  app.use('/api/language', require('../routes/languageRoutes'));
 
   // Root route
   app.get('/', (req, res) => {

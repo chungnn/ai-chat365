@@ -6,6 +6,7 @@ import chat from './modules/chat';
 import order from './modules/order';
 import notification from './modules/notification';
 import urlMetadata from './modules/urlMetadata';
+import language from './modules/language';
 
 export default createStore({
   modules: {
@@ -15,7 +16,8 @@ export default createStore({
     chat,
     order,
     notification,
-    urlMetadata
+    urlMetadata,
+    language
   },
   state: {
     isLoading: false,
