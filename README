@@ -1,6 +1,6 @@
 # AI Helpdesk Support System
 
-This repository is designed for managing and developing an AI-based helpdesk support system with a focus on chat functionality. Below is an overview of the repository:
+An open source AI-based helpdesk support system with a focus on chat functionality, designed to provide intelligent customer support with human agent integration.
 
 ## Features
 - AI-powered chat support for customer inquiries
@@ -9,28 +9,63 @@ This repository is designed for managing and developing an AI-based helpdesk sup
 - Knowledge base integration for accurate responses
 - Analytics and reporting on support metrics
 
-## Structure
-- **/src**: Contains the source code for the project.
-- **/data**: Includes datasets used for training and testing AI models.
-- **/docs**: Documentation and guides for using and contributing to the project.
-- **/tests**: Unit and integration tests for ensuring code quality.
+## Project Structure
+This project consists of four main components:
+- **/end-user-api**: Backend API for end-users
+- **/end-user-ui**: Frontend application for end-users
+- **/mgmt-api**: Backend API for management/administration
+- **/mgmt-ui**: Frontend application for management/administration
 
 ## Getting Started
+
+### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB
+- Redis (optional, for enhanced real-time functionality)
+
+### Installation
+
 1. Clone the repository:
+    ```powershell
+    git clone https://github.com/chungnn/ai-chat365.git
+    cd ai-chat365
     ```
-    git clone https://github.com/chungnn/ai-chat365
-    ```
-2. Install dependencies:
-    ```
+
+2. Set up the end-user API:
+    ```powershell
+    cd end-user-api
     npm install
+    # Configure your .env file based on the example
+    npm run dev
     ```
-3. Run the application:
+
+3. Set up the end-user UI (in a new terminal):
+    ```powershell
+    cd end-user-ui
+    npm install
+    npm run serve
     ```
-    npm start
+
+4. Set up the management API (in a new terminal):
+    ```powershell
+    cd mgmt-api
+    npm install
+    # Configure your .env file based on the example
+    npm run dev
     ```
+
+5. Set up the management UI (in a new terminal):
+    ```powershell
+    cd mgmt-ui
+    npm install
+    npm run serve
+    ```
+
+## Configuration
+Each component has its own configuration needs. Refer to the README files in each directory for specific configuration details.
 
 ## Contributing
-Contributions are welcome! Please follow the guidelines in the `CONTRIBUTING.md` file.
+This is an open source project and contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
 
 ## License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

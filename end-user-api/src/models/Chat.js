@@ -42,15 +42,14 @@ const chatSchema = new mongoose.Schema({
     type: String,
     enum: ['open', 'in-progress', 'waiting', 'resolved', 'closed'],
     default: 'open'
-  },
-  priority: {
+  },  priority: {
     type: String,
     enum: ['low', 'medium', 'high', 'urgent'],
     default: 'medium'
   },
   category: {
-    type: String,
-    default: 'general'
+    type: mongoose.Schema.Types.ObjectId,
+    default: null
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

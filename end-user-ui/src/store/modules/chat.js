@@ -10,9 +10,8 @@ const state = {
   loading: false,
   currentChatId: null,
   ticketId: null, // Store the ticket ID for helpdesk
-  status: 'open', // Track ticket status (open, in-progress, waiting, resolved, closed)
-  priority: 'medium', // Track ticket priority (low, medium, high, urgent)
-  category: 'general', // Track ticket category
+  status: 'open', // Track ticket status (open, in-progress, waiting, resolved, closed)  priority: 'medium', // Track ticket priority (low, medium, high, urgent)
+  category: null, // Track ticket category
   assignedTo: null, // Track assigned agent
   activeAgents: [], // Track active agents in the chat
   typingUsers: {}, // Track users who are typing
