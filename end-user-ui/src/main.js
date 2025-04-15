@@ -8,6 +8,7 @@ import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import axios from './plugins/axios';
 import SocketPlugin from './plugins/socket';
+import i18n from './plugins/i18n';
 
 // Cấu hình Vuetify
 const vuetify = createVuetify({
@@ -39,6 +40,7 @@ app.use(router);
 app.use(store);
 app.use(vuetify);
 app.use(SocketPlugin);
+app.use(i18n);
 
 // Đăng ký instance axios
 app.config.globalProperties.$http = axios;

@@ -2,12 +2,12 @@
   <v-app>    <v-app-bar color="primary" dark>
       <template v-slot:prepend>
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      </template>
-      <v-app-bar-title>Trung tâm hỗ trợ khách hàng</v-app-bar-title>
+      </template>      <v-app-bar-title>{{ $t('common.appName') }}</v-app-bar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="!isAuthenticated" text to="/login">Đăng nhập</v-btn>
-      <v-btn v-if="!isAuthenticated" variant="outlined" to="/register">Đăng ký</v-btn>
-      <v-menu v-else location="bottom end">
+      <v-btn v-if="!isAuthenticated" text to="/login">{{ $t('common.login') }}</v-btn>
+      <v-btn v-if="!isAuthenticated" variant="outlined" to="/register">{{ $t('common.register') }}</v-btn>
+      <LanguageSwitcher class="ml-2" />
+      <v-menu v-if="isAuthenticated" location="bottom end">
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props">
             <v-avatar size="32">
@@ -15,44 +15,41 @@
               <v-icon v-else>mdi-account-circle</v-icon>
             </v-avatar>
           </v-btn>
-        </template>
-        <v-list>
+        </template>        <v-list>
           <v-list-item to="/profile">
-            <v-list-item-title>Hồ sơ</v-list-item-title>
+            <v-list-item-title>{{ $t('common.profile') }}</v-list-item-title>
           </v-list-item>
           <v-list-item to="/">
-            <v-list-item-title>Yêu cầu hỗ trợ</v-list-item-title>
+            <v-list-item-title>{{ $t('ticket.createTicket') }}</v-list-item-title>
           </v-list-item>
           <v-divider></v-divider>
           <v-list-item @click="logout">
-            <v-list-item-title>Đăng xuất</v-list-item-title>
+            <v-list-item-title>{{ $t('common.logout') }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
     </v-app-bar><v-navigation-drawer v-model="drawer" temporary>      <v-list-item>
-        <v-list-item-title class="text-h6">Hỗ trợ khách hàng</v-list-item-title>
-        <v-list-item-subtitle>Giải pháp hỗ trợ tức thì</v-list-item-subtitle>
+        <v-list-item-title class="text-h6">{{ $t('common.appName') }}</v-list-item-title>
+        <v-list-item-subtitle>{{ $t('common.welcome') }}</v-list-item-subtitle>
       </v-list-item>
 
-      <v-divider></v-divider>
-
-      <v-list density="compact" nav>      <v-list-item to="/" link>
+      <v-divider></v-divider>      <v-list density="compact" nav>      <v-list-item to="/" link>
           <template v-slot:prepend>
             <v-icon>mdi-chat-processing</v-icon>
           </template>
-          <v-list-item-title>Hỗ trợ trực tuyến</v-list-item-title>
+          <v-list-item-title>{{ $t('chat.startChat') }}</v-list-item-title>
         </v-list-item>
         <v-list-item to="/about" link>
           <template v-slot:prepend>
             <v-icon>mdi-information</v-icon>
           </template>
-          <v-list-item-title>Giới thiệu</v-list-item-title>
+          <v-list-item-title>{{ $t('common.about') }}</v-list-item-title>
         </v-list-item>
         <v-list-item to="/contact" link>
           <template v-slot:prepend>
             <v-icon>mdi-email</v-icon>
           </template>
-          <v-list-item-title>Liên hệ</v-list-item-title>
+          <v-list-item-title>{{ $t('common.contact') }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>    <v-main>
@@ -61,7 +58,7 @@
       </v-container>
     </v-main>    <v-footer app>
       <div class="w-100 text-center">
-        {{ new Date().getFullYear() }} — <strong>Trung tâm hỗ trợ khách hàng</strong>
+        {{ new Date().getFullYear() }} — <strong>{{ $t('common.appName') }}</strong>
       </div>
     </v-footer>
   </v-app>
@@ -71,6 +68,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import LanguageSwitcher from './components/common/LanguageSwitcher.vue';
 
 const store = useStore();
 const router = useRouter();
@@ -102,8 +100,6 @@ onMounted(() => {
   if (localStorage.getItem('token')) {
     store.dispatch('auth/fetchUser');
   }
-  // Initialize chat history if needed
-  store.dispatch('chat/initializeChats');
 });
 </script>
 

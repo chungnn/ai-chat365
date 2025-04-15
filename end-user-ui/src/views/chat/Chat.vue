@@ -1,33 +1,36 @@
-<template>
-  <div class="chat-container">
-    <v-card class="chat-card">      <v-card-title class="chat-header">
-        <v-icon left>mdi-headset</v-icon>
-        Trung tâm hỗ trợ khách hàng
-        <span v-if="ticketId" class="ticket-badge ml-2">
-          <v-chip color="primary" small class="ticket-id">
-            <v-icon left small>mdi-ticket-outline</v-icon>
-            {{ ticketId }}
-          </v-chip>
-          <v-chip :color="statusColor" small class="ml-1">
-            {{ statusText }}
-          </v-chip>
-        </span>
+<template>  <div class="chat-container">
+    <v-card class="chat-card">      <v-card-title class="chat-header d-flex align-center">
+        <div class="d-flex align-center">
+          <v-icon left>mdi-headset</v-icon>
+          {{ $t('common.appName') }}
+          <span v-if="ticketId" class="ticket-badge ml-2">
+            <v-chip color="primary" small class="ticket-id">
+              <v-icon left small>mdi-ticket-outline</v-icon>
+              {{ ticketId }}
+            </v-chip>
+            <v-chip :color="statusColor" small class="ml-1">
+              {{ statusText }}
+            </v-chip>
+          </span>
+        </div>
         <v-spacer></v-spacer>
-        <v-btn 
-          color="error" 
-          small 
-          class="mr-2" 
-          @click="transferToAgent" 
-          :disabled="waitingForAgent || isTransferring"
-          :loading="isTransferring"
-          title="Kết nối với nhân viên hỗ trợ"
-        >
-          <v-icon left>mdi-account-tie</v-icon>
-          Gặp nhân viên hỗ trợ
-        </v-btn>
-        <v-btn icon @click="createNewChat" title="Tạo yêu cầu hỗ trợ mới">
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
+        <div class="d-flex ml-auto">
+          <v-btn 
+            color="error" 
+            small 
+            class="mr-2" 
+            @click="transferToAgent" 
+            :disabled="waitingForAgent || isTransferring"
+            :loading="isTransferring"
+            :title="$t('chat.connectToAgent')"
+          >
+            <v-icon left>mdi-account-tie</v-icon>
+            {{ $t('chat.humanAgent') }}
+          </v-btn>
+          <v-btn icon @click="createNewChat" :title="$t('chat.createNewChat')">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </div>
       </v-card-title>
 
       <v-card-text class="chat-body">
@@ -46,8 +49,8 @@
             </div>
           </template>          <div v-else class="empty-chat">
             <v-icon size="64" color="grey lighten-1">mdi-help-circle-outline</v-icon>
-            <p>Chào mừng đến với hệ thống hỗ trợ khách hàng</p>
-            <p class="text-body-2">Vui lòng mô tả vấn đề của bạn để chúng tôi có thể giúp đỡ</p>
+            <p>{{ $t('chat.welcome') }}</p>
+            <p class="text-body-2">{{ $t('chat.describeProblem') }}</p>
           </div>
 
           <div v-if="isTyping" class="typing-indicator">
@@ -58,12 +61,10 @@
         </div>
       </v-card-text>
 
-      <v-divider></v-divider>
-
-      <v-card-actions class="chat-footer">
+      <v-divider></v-divider>      <v-card-actions class="chat-footer">
         <v-text-field
           v-model="newMessage"
-          placeholder="Nhập câu hỏi của bạn..."
+          :placeholder="$t('chat.enterQuestion')"
           outlined
           dense
           hide-details
@@ -80,36 +81,34 @@
           <v-icon>mdi-send</v-icon>
         </v-btn>
       </v-card-actions>
-    </v-card>
-
-    <v-dialog v-model="showUserInfoDialog" max-width="500px">
+    </v-card>    <v-dialog v-model="showUserInfoDialog" max-width="500px">
       <v-card>
-        <v-card-title>Thông tin liên hệ</v-card-title>
+        <v-card-title>{{ $t('chat.contactInfo') }}</v-card-title>
         <v-card-text>
-          <p>Vui lòng để lại thông tin để chúng tôi có thể hỗ trợ bạn tốt hơn:</p>
+          <p>{{ $t('chat.pleaseProvideInfo') }}</p>
           <v-form ref="userInfoForm" v-model="userInfoFormValid">
             <v-text-field
               v-model="userInfo.name"
-              label="Họ và tên"
-              :rules="[v => !!v || 'Vui lòng nhập họ tên']"
+              :label="$t('chat.name')"
+              :rules="[v => !!v || $t('chat.pleaseEnterName')]"
               required
             ></v-text-field>
             <v-text-field
               v-model="userInfo.email"
-              label="Email"
+              :label="$t('chat.email')"
               :rules="[
-                v => !!v || 'Vui lòng nhập email',
-                v => /.+@.+\..+/.test(v) || 'Email không hợp lệ'
+                v => !!v || $t('chat.pleaseEnterEmail'),
+                v => /.+@.+\..+/.test(v) || $t('chat.invalidEmail')
               ]"
               type="email"
               required
             ></v-text-field>
             <v-text-field
               v-model="userInfo.phone"
-              label="Số điện thoại"
+              :label="$t('chat.phoneNumber')"
               :rules="[
-                v => !!v || 'Vui lòng nhập số điện thoại',
-                v => /^\d{10,11}$/.test(v) || 'Số điện thoại không hợp lệ'
+                v => !!v || $t('chat.pleaseEnterPhone'),
+                v => /^\d{10,11}$/.test(v) || $t('chat.invalidPhone')
               ]"
               type="tel"
               required
@@ -119,36 +118,35 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" @click="submitUserInfo" :loading="isUpdatingUserInfo">
-            Xác nhận
+            {{ $t('chat.confirm') }}
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>    <v-dialog v-model="showTransferDialog" max-width="500px">
       <v-card>
-        <v-card-title>Yêu cầu hỗ trợ từ nhân viên</v-card-title>
+        <v-card-title>{{ $t('chat.transferRequest') }}</v-card-title>
         <v-card-text>
-          <p>Bạn có muốn kết nối với nhân viên hỗ trợ kỹ thuật để được giải quyết vấn đề trực tiếp không?</p>
+          <p>{{ $t('chat.transferQuestion') }}</p>
           <v-textarea
             v-model="transferReason"
-            label="Vấn đề cần hỗ trợ (tùy chọn)"
-            hint="Mô tả ngắn gọn vấn đề để nhân viên hỗ trợ có thể chuẩn bị trước"
+            :label="$t('chat.transferDescription')"
+            :hint="$t('chat.transferHint')"
             rows="3"
           ></v-textarea>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text @click="showTransferDialog = false">Không, tiếp tục với AI</v-btn>
+          <v-btn text @click="showTransferDialog = false">{{ $t('chat.stayWithAI') }}</v-btn>
           <v-btn color="primary" @click="transferToAgent" :loading="isTransferring">
-            Có, kết nối ngay
+            {{ $t('chat.connectNow') }}
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
-      <v-dialog v-model="showFeedbackDialog" max-width="500px">
+    </v-dialog>      <v-dialog v-model="showFeedbackDialog" max-width="500px">
       <v-card>
-        <v-card-title>Đánh giá chất lượng hỗ trợ</v-card-title>
+        <v-card-title>{{ $t('chat.feedbackTitle') }}</v-card-title>
         <v-card-text>
-          <p>Cảm ơn bạn đã sử dụng dịch vụ hỗ trợ của chúng tôi. Vui lòng đánh giá trải nghiệm của bạn:</p>
+          <p>{{ $t('chat.feedbackThankYou') }}</p>
           <div class="text-center">
             <v-rating
               v-model="satisfaction.rating"
@@ -160,28 +158,26 @@
             ></v-rating>
           </div>
           <v-radio-group v-model="satisfaction.issueResolved" row>
-            <p class="mb-2">Vấn đề của bạn đã được giải quyết chưa?</p>
-            <v-radio label="Đã giải quyết" value="resolved"></v-radio>
-            <v-radio label="Chưa giải quyết" value="unresolved"></v-radio>
+            <p class="mb-2">{{ $t('chat.issueResolved') }}</p>
+            <v-radio :label="$t('chat.resolved')" value="resolved"></v-radio>
+            <v-radio :label="$t('chat.unresolved')" value="unresolved"></v-radio>
           </v-radio-group>
           <v-textarea
             v-model="satisfaction.feedback"
-            label="Góp ý của bạn"
-            hint="Ý kiến của bạn giúp chúng tôi cải thiện chất lượng dịch vụ"
+            :label="$t('chat.feedback')"
+            :hint="$t('chat.feedbackHint')"
             rows="3"
           ></v-textarea>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text @click="showFeedbackDialog = false">Bỏ qua</v-btn>
+          <v-btn text @click="showFeedbackDialog = false">{{ $t('chat.skip') }}</v-btn>
           <v-btn color="primary" @click="submitFeedback" :loading="isSubmittingFeedback">
-            Gửi đánh giá
+            {{ $t('chat.sendFeedback') }}
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
-
-    <v-snackbar
+    </v-dialog>    <v-snackbar
       v-model="snackbar.show"
       :color="snackbar.color"
       :timeout="snackbar.timeout"
@@ -190,12 +186,12 @@
       {{ snackbar.text }}
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar.show = false">
-          Đóng
+          {{ $t('chat.close') }}
         </v-btn>
       </template>
     </v-snackbar>
 
-    <loading-overlay :loading="isInitialLoading" text="Đang tải cuộc trò chuyện..."></loading-overlay>
+    <loading-overlay :loading="isInitialLoading" :text="$t('chat.loading')"></loading-overlay>
   </div>
 </template>
 
@@ -204,7 +200,6 @@ import { mapGetters } from 'vuex';
 import { useSocket } from '@/composables/useSocket';
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue';
 import UrlPreview from '@/components/chat/UrlPreview.vue';
-import axios from '@/plugins/axios';
 
 export default {
   name: 'Chat',
@@ -259,16 +254,15 @@ export default {
       typingUsers: 'chat/typingUsers',
       sessionId: 'chat/getSessionId',
       chatStatus: 'chat/getStatus'
-    }),
-    statusText() {
+    }),    statusText() {
       const statusMap = {
-        'open': 'Mới',
-        'in-progress': 'Đang xử lý',
-        'waiting': 'Đang chờ',
-        'resolved': 'Đã giải quyết',
-        'closed': 'Đã đóng'
+        'open': this.$t('chat.status.new'),
+        'in-progress': this.$t('chat.status.inProgress'),
+        'waiting': this.$t('chat.status.waiting'),
+        'resolved': this.$t('chat.status.resolved'),
+        'closed': this.$t('chat.status.closed')
       };
-      return this.chatStatus ? statusMap[this.chatStatus] || 'Không xác định' : '';
+      return this.chatStatus ? statusMap[this.chatStatus] || this.$t('chat.status.unknown') : '';
     },
     statusColor() {
       const colorMap = {
@@ -397,15 +391,13 @@ export default {
         if (!this.userInfo.phone && this.messages.length > 3 && !this.suggestContactInfo) {
           this.suggestContactInfo = true;
           this.showUserInfoDialog = true;
-        }
-
-        // Nếu đang chờ nhân viên tư vấn
+        }        // Nếu đang chờ nhân viên tư vấn
         if (response && response.waitingForAgent) {
           this.waitingForAgent = true;
-          this.showSnackbar('Tin nhắn của bạn đã được gửi tới nhân viên tư vấn. Vui lòng đợi phản hồi.', 'info');
+          this.showSnackbar(this.$t('chat.messageSentToAgent'), 'info');
         }
       } catch (error) {
-        this.showSnackbar('Có lỗi xảy ra khi gửi tin nhắn', 'error');
+        this.showSnackbar(this.$t('chat.errorSendingMessage'), 'error');
       }
     },    async createNewChat() {
       try {
@@ -420,11 +412,10 @@ export default {
         
         // Khởi tạo phiên chat mới
         this.initChat();
-        
-        this.waitingForAgent = false;
-        this.showSnackbar('Đã tạo cuộc trò chuyện mới', 'success');
+          this.waitingForAgent = false;
+        this.showSnackbar(this.$t('chat.newChatCreated'), 'success');
       } catch (error) {
-        this.showSnackbar('Không thể tạo cuộc trò chuyện mới', 'error');
+        this.showSnackbar(this.$t('chat.errorCreatingNewChat'), 'error');
       }
     },
 
@@ -433,26 +424,23 @@ export default {
 
       this.isUpdatingUserInfo = true;
       try {
-        // Sử dụng action từ store thay vì gọi axios trực tiếp
-        await this.$store.dispatch('chat/updateUserInfo', this.userInfo);
+        // Sử dụng action từ store thay vì gọi axios trực tiếp        await this.$store.dispatch('chat/updateUserInfo', this.userInfo);
         this.showUserInfoDialog = false;
-        this.showSnackbar('Cảm ơn bạn đã cung cấp thông tin liên hệ!', 'success');
+        this.showSnackbar(this.$t('chat.thankYouForInfo'), 'success');
       } catch (error) {
-        this.showSnackbar('Không thể cập nhật thông tin liên hệ', 'error');
+        this.showSnackbar(this.$t('chat.errorUpdatingContactInfo'), 'error');
       } finally {
         this.isUpdatingUserInfo = false;
       }
     },    async transferToAgent() {
       this.isTransferring = true;
-      try {
-        const reason = this.transferReason || 'Người dùng yêu cầu hỗ trợ kỹ thuật';
+      try {        const reason = this.transferReason || this.$t('chat.defaultTransferReason');
         // Sử dụng action từ store thay vì gọi axios trực tiếp
         await this.$store.dispatch('chat/transferToAgent', reason);
         this.waitingForAgent = true;
         this.showTransferDialog = false;
-        this.showSnackbar('Yêu cầu của bạn đã được chuyển tới nhân viên hỗ trợ kỹ thuật. Vui lòng đợi trong giây lát.', 'info', 6000);
-      } catch (error) {
-        this.showSnackbar('Không thể chuyển cuộc trò chuyện tới nhân viên tư vấn', 'error');
+        this.showSnackbar(this.$t('chat.transferredToAgent'), 'info', 6000);      } catch (error) {
+        this.showSnackbar(this.$t('chat.errorTransferringToAgent'), 'error');
       } finally {
         this.isTransferring = false;
       }
@@ -496,10 +484,9 @@ export default {
         // Join the chat room for real-time updates
         if (this.sessionId && this.socket.joinChatRoom) {
           this.socket.joinChatRoom(this.sessionId);
-        }
-      } catch (error) {
+        }      } catch (error) {
         console.error('Lỗi khởi tạo chat:', error);
-        this.showSnackbar('Không thể khởi tạo cuộc trò chuyện', 'error');
+        this.showSnackbar(this.$t('chat.errorInitializingChat'), 'error');
       } finally {
         this.isInitialLoading = false;
       }
