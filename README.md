@@ -1,4 +1,4 @@
-# AI Helpdesk Support System
+# Open source AI Helpdesk Support System
 
 An open source AI-based helpdesk support system with a focus on chat functionality, designed to provide intelligent customer support with human agent integration.
 
