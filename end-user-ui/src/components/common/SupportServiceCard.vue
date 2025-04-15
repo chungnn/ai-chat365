@@ -75,34 +75,30 @@ export default {
       required: true
     }
   },
-  methods: {
-    truncateDescription(text) {
-      return text && text.length > 100 ? text.substring(0, 100) + '...' : text;
-    },
-    getPriorityColor(priority) {
+  methods: {    truncateDescription(text) {
+      return text && text.length > 100 ? text.substring(0, 100) + this.$t('common.ellipsis') : text;
+    },    getPriorityColor(priority) {
       const colors = {
-        'Cao': 'red',
-        'Trung bình': 'orange',
-        'Thấp': 'green'
+        [this.$t('service.priority.high')]: 'red',
+        [this.$t('service.priority.medium')]: 'orange',
+        [this.$t('service.priority.low')]: 'green'
       };
       return colors[priority] || 'blue';
-    },
-    getStatusColor(status) {
+    },    getStatusColor(status) {
       const colors = {
-        'Đang xử lý': 'warning',
-        'Đã hoàn thành': 'success',
-        'Chưa xử lý': 'error',
-        'Chờ phản hồi': 'info'
+        [this.$t('service.status.processing')]: 'warning',
+        [this.$t('service.status.completed')]: 'success',
+        [this.$t('service.status.pending')]: 'error',
+        [this.$t('service.status.waiting')]: 'info'
       };
       return colors[status] || 'grey';
-    },
-    getResponseTime(priority) {
+    },    getResponseTime(priority) {
       const times = {
-        'Cao': 'Phản hồi trong 30 phút',
-        'Trung bình': 'Phản hồi trong 2 giờ',
-        'Thấp': 'Phản hồi trong 24 giờ'
+        [this.$t('service.priority.high')]: this.$t('service.responseTime.high'),
+        [this.$t('service.priority.medium')]: this.$t('service.responseTime.medium'),
+        [this.$t('service.priority.low')]: this.$t('service.responseTime.low')
       };
-      return times[priority] || 'Phản hồi trong 24 giờ';
+      return times[priority] || this.$t('service.responseTime.default');
     },
     requestSupport() {
       this.$router.push('/');

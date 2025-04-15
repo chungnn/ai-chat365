@@ -222,9 +222,8 @@ export default {
         const videoId = this.videoType === 'youtube' ? this.getYoutubeVideoId(this.url) :
                         this.videoType === 'vimeo' ? this.getVimeoVideoId(this.url) :
                         this.getDailymotionVideoId(this.url);
-        
-        // Đối với từng video platform, có thể tạo thông tin phù hợp
-        const title = `${this.videoType.charAt(0).toUpperCase() + this.videoType.slice(1)} Video: ${videoId}`;
+          // Đối với từng video platform, có thể tạo thông tin phù hợp
+        const title = `${this.videoType.charAt(0).toUpperCase() + this.videoType.slice(1)} ${this.$t('common.video')}: ${videoId}`;
         
         // Không cập nhật trực tiếp metadata ở đây vì nó đã được quản lý bởi Vuex
         // Tuy nhiên, có thể dispatch một action để cập nhật nếu cần

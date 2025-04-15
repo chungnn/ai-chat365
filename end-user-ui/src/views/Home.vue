@@ -9,83 +9,80 @@
               class="white--text align-end"
               gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
             >
-              <v-card-title>Chào mừng đến với Trung tâm hỗ trợ khách hàng</v-card-title>
+              <v-card-title>{{ $t('home.welcome') }}</v-card-title>
             </v-img>
             <v-card-text>
               <p class="text-h6 text--primary">
-                Giải pháp hỗ trợ thông minh với công nghệ AI tiên tiến
+                {{ $t('home.tagline') }}
               </p>
-              <p>Nhận hỗ trợ nhanh chóng và hiệu quả từ đội ngũ chuyên viên và trợ lý AI của chúng tôi</p>
+              <p>{{ $t('home.description') }}</p>
             </v-card-text>            <v-card-actions>
               <v-btn
                 color="primary"
                 to="/"
                 text
               >
-                Bắt đầu hội thoại
+                {{ $t('home.startChat') }}
               </v-btn>
               <v-btn
                 color="primary"
                 to="/contact"
                 outlined
               >
-                Liên hệ bộ phận hỗ trợ
+                {{ $t('home.contactSupport') }}
               </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
       </v-row>      <v-row>
         <v-col cols="12">
-          <h2 class="text-h4 mb-4">Dịch vụ hỗ trợ của chúng tôi</h2>
+          <h2 class="text-h4 mb-4">{{ $t('home.ourServices') }}</h2>
         </v-col>
       </v-row>
       
-      <v-row>        <v-col cols="12" sm="6" md="4">
-          <v-card class="mx-auto" outlined>
+      <v-row>        <v-col cols="12" sm="6" md="4">          <v-card class="mx-auto" outlined>
             <v-card-title>
               <v-icon color="primary" class="mr-2">mdi-tools</v-icon>
-              Hỗ trợ kỹ thuật
+              {{ $t('home.services.technical.title') }}
             </v-card-title>
             <v-card-text>
-              Giải quyết các vấn đề kỹ thuật, xử lý sự cố và hướng dẫn sử dụng các tính năng của sản phẩm.
+              {{ $t('home.services.technical.description') }}
             </v-card-text>
             <v-card-actions>
               <v-btn text color="primary" to="/">
-                Yêu cầu hỗ trợ
+                {{ $t('home.services.technical.button') }}
                 <v-icon small class="ml-1">mdi-arrow-right</v-icon>
               </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-card class="mx-auto" outlined>
+        <v-col cols="12" sm="6" md="4">          <v-card class="mx-auto" outlined>
             <v-card-title>
               <v-icon color="primary" class="mr-2">mdi-lightbulb</v-icon>
-              Tư vấn giải pháp
+              {{ $t('home.services.consulting.title') }}
             </v-card-title>
             <v-card-text>
-              Tư vấn và đề xuất giải pháp phù hợp với nhu cầu cụ thể của khách hàng.
+              {{ $t('home.services.consulting.description') }}
             </v-card-text>
             <v-card-actions>
               <v-btn text color="primary" to="/">
-                Tư vấn ngay
+                {{ $t('home.services.consulting.button') }}
                 <v-icon small class="ml-1">mdi-arrow-right</v-icon>
               </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-card class="mx-auto" outlined>
+        <v-col cols="12" sm="6" md="4">          <v-card class="mx-auto" outlined>
             <v-card-title>
               <v-icon color="primary" class="mr-2">mdi-update</v-icon>
-              Hỗ trợ nâng cấp
+              {{ $t('home.services.upgrade.title') }}
             </v-card-title>
             <v-card-text>
-              Hướng dẫn quy trình nâng cấp sản phẩm và giải đáp thắc mắc liên quan đến tính năng mới.
+              {{ $t('home.services.upgrade.description') }}
             </v-card-text>
             <v-card-actions>
               <v-btn text color="primary" to="/">
-                Tìm hiểu thêm
+                {{ $t('home.services.upgrade.button') }}
                 <v-icon small class="ml-1">mdi-arrow-right</v-icon>
               </v-btn>
             </v-card-actions>
@@ -93,7 +90,7 @@
         </v-col>
       </v-row>      <v-row class="mt-10">
         <v-col cols="12">
-          <h2 class="text-h4 mb-4">Tại sao chọn trung tâm hỗ trợ của chúng tôi?</h2>
+          <h2 class="text-h4 mb-4">{{ $t('home.whyChooseUs') }}</h2>
         </v-col>
       </v-row>
 

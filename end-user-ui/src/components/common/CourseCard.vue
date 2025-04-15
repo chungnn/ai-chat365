@@ -39,13 +39,12 @@
       ></v-rating>
       <span class="caption ml-1">{{ course.rating.toFixed(1) }}</span>
       <v-spacer></v-spacer>
-      <div class="d-flex flex-column align-end">
-        <div v-if="course.discountPrice" class="d-flex align-center">
-          <span class="text-decoration-line-through caption grey--text mr-1">{{ formatPrice(course.price) }}đ</span>
-          <span class="subtitle-1 font-weight-bold">{{ formatPrice(course.discountPrice) }}đ</span>
+      <div class="d-flex flex-column align-end">        <div v-if="course.discountPrice" class="d-flex align-center">
+          <span class="text-decoration-line-through caption grey--text mr-1">{{ formatPrice(course.price) }}{{ $t('common.currency') }}</span>
+          <span class="subtitle-1 font-weight-bold">{{ formatPrice(course.discountPrice) }}{{ $t('common.currency') }}</span>
         </div>
         <div v-else>
-          <span class="subtitle-1 font-weight-bold">{{ formatPrice(course.price) }}đ</span>
+          <span class="subtitle-1 font-weight-bold">{{ formatPrice(course.price) }}{{ $t('common.currency') }}</span>
         </div>
       </div>
     </v-card-actions>
@@ -74,9 +73,8 @@ export default {
       required: true
     }
   },
-  methods: {
-    truncateDescription(text) {
-      return text && text.length > 100 ? text.substring(0, 100) + '...' : text;
+  methods: {    truncateDescription(text) {
+      return text && text.length > 100 ? text.substring(0, 100) + this.$t('common.ellipsis') : text;
     },
     formatPrice(price) {
       return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");

@@ -1,11 +1,10 @@
-<template>
-  <div v-if="loading" class="loading-overlay">
+<template>  <div v-if="loading" class="loading-overlay">
     <v-progress-circular
       indeterminate
       color="primary"
       size="64"
     ></v-progress-circular>
-    <div class="loading-text mt-3">{{ text || 'Đang tải...' }}</div>
+    <div class="loading-text mt-3">{{ text || $t('common.loading') }}</div>
   </div>
 </template>
 
