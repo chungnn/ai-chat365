@@ -20,14 +20,6 @@ const client = new Client({
   }
 });
 
-// Initialize Google Generative AI and embedding model for vector search
-let embeddingModel = null;
-try {
-  embeddingModel = aiService.getEmbeddingModel();
-} catch (error) {
-  console.error('Error initializing embedding model:', error);
-}
-
 const INDEX_NAME = 'knowledge_base2';
 
 /**
@@ -52,40 +44,54 @@ const getRelevantInformation = async (query) => {
     let results = [];
 
     // If embedding model is available, do vector search (semantic search)
-    if (embeddingModel) {
-      try {
-        const embedding = await embeddingModel.embedContent(query);
 
-        // Semantic search using vector similarity
-        const vectorResponse = await client.search({
-          index: INDEX_NAME,
-          body: {
-            query: {
-              script_score: {
-                query: { match_all: {} },
-                script: {
-                  source: "cosineSimilarity(params.query_vector, 'embedding') + 1.0",
-                  params: { query_vector: embedding.values }
+    try {
+      const embedding = await aiService.generateEmbedding(query);
+      
+      // Semantic search using vector similarity
+      const vectorResponse = await client.search({
+        index: INDEX_NAME,
+        body: {
+          query: {
+            bool: {
+              must: [
+                // This ensures we only include documents where embedding exists and is not null
+                {
+                  exists: {
+                    field: "embedding"
+                  }
                 }
-              }
-            },
-            sort: ["_score"],
-            size: 3 // Limit to top 3 most relevant results
-          }
-        });
+              ],
+              should: [
+                {
+                  script_score: {
+                    query: { match_all: {} },
+                    script: {
+                      source: "cosineSimilarity(params.query_vector, 'embedding') + 1.0",
+                      params: { query_vector: embedding }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          sort: ["_score"],
+          size: 3 // Limit to top 3 most relevant results
+        }
+      });
 
-        results = vectorResponse.hits.hits.map(hit => ({
-          title: hit._source.title || '',
-          content: hit._source.content,
-          score: hit._score
-        }));
+      results = vectorResponse.hits.hits.map(hit => ({
+        title: hit._source.title || '',
+        content: hit._source.content,
+        score: hit._score
+      }));
 
-        console.log(`Vector search found ${results.length} relevant items`);
-      } catch (embeddingError) {
-        console.error('Error in vector search:', embeddingError);
-        // Fall back to text search if vector search fails
-      }
+      console.log(`Vector search found ${results.length} relevant items`);
+    } catch (embeddingError) {
+      console.error('Error in vector search:', embeddingError);
+      // Fall back to text search if vector search fails
     }
+
 
     // If no results from vector search or embedding model not available, do text search
     if (results.length === 0) {
@@ -108,7 +114,7 @@ const getRelevantInformation = async (query) => {
         content: hit._source.content,
         score: hit._score
       }));
-      
+
       console.log(`Text search found ${results.length} relevant items`);
     }
 
@@ -139,10 +145,10 @@ const verifyElasticsearchConnection = async () => {
   try {
     // Check if Elasticsearch is running
     const health = await client.cluster.health();
-    
+
     // Check if our index exists
     const indexExists = await client.indices.exists({ index: INDEX_NAME });
-    
+
     return {
       connected: health.status !== 'red',
       indexExists: indexExists,
