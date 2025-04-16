@@ -9,6 +9,7 @@ const ChatDetail = () => import('../views/chat/ChatDetail.vue');
 const TagManagement = () => import('../views/tags/TagManagement.vue');
 const CategoryManagement = () => import('../views/categories/CategoryManagement.vue');
 const UserManagement = () => import('../views/users/UserManagement.vue');
+const KnowledgeManagement = () => import('../views/knowledge/KnowledgeManagement.vue');
 const NotFound = () => import('../views/NotFound.vue');
 
 const routes = [
@@ -49,11 +50,16 @@ const routes = [
     name: 'CategoryManagement',
     component: CategoryManagement,
     meta: { requiresAuth: true }
-  },
-  {
+  },  {
     path: '/users',
     name: 'UserManagement',
     component: UserManagement,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/knowledge',
+    name: 'KnowledgeManagement',
+    component: KnowledgeManagement,
     meta: { requiresAuth: true }
   },
   {

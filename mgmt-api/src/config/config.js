@@ -18,5 +18,13 @@ module.exports = {
   admin: {
     defaultEmail: process.env.ADMIN_EMAIL || 'admin@example.com',
     defaultPassword: process.env.ADMIN_PASSWORD || 'adminPassword123'
+  },
+  elasticsearch: {
+    node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200',
+    username: process.env.ELASTICSEARCH_USERNAME || 'elastic',
+    password: process.env.ELASTICSEARCH_PASSWORD || 'password'
+  },
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || 'your_gemini_api_key',
   }
 };

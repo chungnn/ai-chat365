@@ -16,6 +16,7 @@ const adminRoutes = require('./src/routes/adminRoutes');
 const chatRoutes = require('./src/routes/chatRoutes');
 const tagRoutes = require('./src/routes/tagRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
+const knowledgeRoutes = require('./src/routes/knowledgeRoutes');
 
 // Import middleware
 const { authenticate } = require('./src/middleware/auth');
@@ -110,14 +111,14 @@ const initializeServer = async () => {
   // Apply authentication middleware to all socket connections
   io.use(socketService.authenticateSocket);
     // Make io instance available to routes
-  app.set('io', io);  // Routes
-  app.use('/api/auth', authRoutes);
+  app.set('io', io);  // Routes  app.use('/api/auth', authRoutes);
   app.use('/api/admin', authenticate, adminRoutes);
   app.use('/api/chats', authenticate, chatRoutes);
   app.use('/api/tags', authenticate, tagRoutes);
   app.use('/api/categories', authenticate, categoryRoutes);
   app.use('/api/users', authenticate, require('./src/routes/userRoutes'));
   app.use('/api/url-metadata', require('./src/routes/urlMetadataRoutes'));
+  app.use('/api/knowledge', authenticate, knowledgeRoutes);
     // Socket.IO connections
   io.on('connection', (socket) => {
     socketService.handleSocket(socket);

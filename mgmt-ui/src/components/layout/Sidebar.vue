@@ -36,14 +36,21 @@
       >
         <span class="icon">📂</span>
         <span>Danh Mục</span>
-      </router-link>
-      <router-link
+      </router-link>      <router-link
         to="/users"
         class="nav-link"
         active-class="active"
       >
         <span class="icon">👥</span>
         <span>Người Dùng</span>
+      </router-link>
+      <router-link
+        to="/knowledge"
+        class="nav-link"
+        active-class="active"
+      >
+        <span class="icon">📚</span>
+        <span>Tri Thức</span>
       </router-link>    </nav>
     <div class="sidebar-footer">
       <p>© 2025 Trung Tâm Hỗ Trợ</p>

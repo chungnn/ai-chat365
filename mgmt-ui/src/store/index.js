@@ -7,6 +7,7 @@ import tags from './modules/tags';
 import urlMetadata from './modules/urlMetadata';
 import categories from './modules/categories';
 import users from './modules/users';
+import knowledge from './modules/knowledge';
 
 // Create vuex persistence for storing state in localStorage
 const vuexLocal = new VuexPersistence({
@@ -15,15 +16,15 @@ const vuexLocal = new VuexPersistence({
   modules: ['auth']
 });
 
-const store = createStore({
-  modules: {
+const store = createStore({  modules: {
     auth,
     chat,
     notification,
     tags,
     urlMetadata,
     categories,
-    users
+    users,
+    knowledge
   },
   plugins: [vuexLocal.plugin]
 });
