@@ -8,7 +8,7 @@ An open source AI-based helpdesk support system with a focus on chat functionali
 - AI-powered chat support for customer inquiries
 - Live agent handoff when AI can't resolve issues
 - Ticket management and tracking system
-- Knowledge base integration for accurate responses
+- Knowledge base integration for accurate responses (coming soon: Elasticsearch-based knowledge management)
 - Analytics and reporting on support metrics
 
 ## Project Structure
@@ -23,7 +23,9 @@ This project consists of four main components:
 ### Prerequisites
 - Node.js (v16 or higher)
 - MongoDB
+- Elasticsearch (for knowledge base functionality)
 - Redis (optional, for enhanced real-time functionality)
+- GEMINI API KEY (obtain from [Google AI Studio](https://makersuite.google.com/app/apikey))
 
 ### Installation
 
