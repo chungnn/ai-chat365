@@ -16,16 +16,16 @@ let contentModel = null;
  * @returns {Object} Google Generative AI instance
  */
 const getGeminiAI = () => {
-  if (!genAI) {
-    try {
-      genAI = new GoogleGenerativeAI(config.gemini.apiKey);
-      console.log('Gemini AI initialized successfully');
-    } catch (error) {
-      console.error('Error initializing Gemini AI:', error);
-      throw error;
+    if (!genAI) {
+        try {
+            genAI = new GoogleGenerativeAI(config.gemini.apiKey);
+            console.log('Gemini AI initialized successfully');
+        } catch (error) {
+            console.error('Error initializing Gemini AI:', error);
+            throw error;
+        }
     }
-  }
-  return genAI;
+    return genAI;
 };
 
 /**
@@ -33,17 +33,17 @@ const getGeminiAI = () => {
  * @returns {Object} Embedding model instance
  */
 const getEmbeddingModel = () => {
-  if (!embeddingModel) {
-    try {
-      const ai = getGeminiAI();
-      embeddingModel = ai.getGenerativeModel({ model: "models/embedding-001" });
-      console.log('Embedding model initialized successfully');
-    } catch (error) {
-      console.error('Error initializing embedding model:', error);
-      throw error;
+    if (!embeddingModel) {
+        try {
+            const ai = getGeminiAI();
+            embeddingModel = ai.getGenerativeModel({ model: "models/embedding-001" });
+            console.log('Embedding model initialized successfully');
+        } catch (error) {
+            console.error('Error initializing embedding model:', error);
+            throw error;
+        }
     }
-  }
-  return embeddingModel;
+    return embeddingModel;
 };
 
 /**
@@ -51,17 +51,17 @@ const getEmbeddingModel = () => {
  * @returns {Object} Content generation model instance
  */
 const getContentModel = () => {
-  if (!contentModel) {
-    try {
-      const ai = getGeminiAI();
-      contentModel = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
-      console.log('Content model initialized successfully');
-    } catch (error) {
-      console.error('Error initializing content model:', error);
-      throw error;
+    if (!contentModel) {
+        try {
+            const ai = getGeminiAI();
+            contentModel = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
+            console.log('Content model initialized successfully');
+        } catch (error) {
+            console.error('Error initializing content model:', error);
+            throw error;
+        }
     }
-  }
-  return contentModel;
+    return contentModel;
 };
 
 /**
@@ -70,14 +70,15 @@ const getContentModel = () => {
  * @returns {Object} - Object containing embedding values
  */
 const generateEmbedding = async (text) => {
-  try {
-    const model = getEmbeddingModel();
-    const embedding = await model.embedContent(text);
-    return embedding;
-  } catch (error) {
-    console.error('Error generating embedding:', error);
-    throw error;
-  }
+    try {
+        const model = getEmbeddingModel();
+        const result = await model.embedContent(text);
+        // Trả về trực tiếp mảng values
+        return result.embedding.values;
+    } catch (error) {
+        console.error('Error generating embedding:', error);
+        throw error;
+    }
 };
 
 /**
@@ -86,11 +87,12 @@ const generateEmbedding = async (text) => {
  * @param {string} defaultTitle - Default title to use if extraction fails
  * @returns {Array} Array of knowledge items with title and content
  */
-const extractKnowledgeItems = async (content, defaultTitle = '') => {  try {
-    const model = getContentModel();
-    
-    // Prompt to extract multiple knowledge items
-    const prompt = `
+const extractKnowledgeItems = async (content, defaultTitle = '') => {
+    try {
+        const model = getContentModel();
+
+        // Prompt to extract multiple knowledge items
+        const prompt = `
 Phân tích nội dung sau và trích xuất các mục tri thức riêng biệt.
 Đối với mỗi chủ đề hoặc mảng kiến thức khác nhau, hãy cung cấp:
 1. Một tiêu đề ngắn gọn đại diện cho chủ đề
@@ -114,38 +116,38 @@ QUAN TRỌNG: Giữ nguyên ngôn ngữ của nội dung gốc trong phản hồ
 ${content}
 `;
 
-    // Generate structured knowledge items using LLM
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+        // Generate structured knowledge items using LLM
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
 
-    // Extract JSON from response
-    const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
-    if (jsonMatch) {
-      try {
-        const knowledgeItems = JSON.parse(jsonMatch[0]);
-        console.log(`Extracted ${knowledgeItems.length} knowledge items from content`);
-        return knowledgeItems;
-      } catch (parseError) {
-        console.error('Error parsing LLM JSON response:', parseError);
+        // Extract JSON from response
+        const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        if (jsonMatch) {
+            try {
+                const knowledgeItems = JSON.parse(jsonMatch[0]);
+                console.log(`Extracted ${knowledgeItems.length} knowledge items from content`);
+                return knowledgeItems;
+            } catch (parseError) {
+                console.error('Error parsing LLM JSON response:', parseError);
+                // Fallback to single item
+                return [{ title: defaultTitle, content }];
+            }
+        } else {
+            // Fallback to single item if JSON parsing fails
+            console.warn('Could not extract JSON from LLM response:', responseText);
+            return [{ title: defaultTitle, content }];
+        }
+    } catch (error) {
+        console.error('Error extracting knowledge items:', error);
         // Fallback to single item
         return [{ title: defaultTitle, content }];
-      }
-    } else {
-      // Fallback to single item if JSON parsing fails
-      console.warn('Could not extract JSON from LLM response:', responseText);
-      return [{ title: defaultTitle, content }];
     }
-  } catch (error) {
-    console.error('Error extracting knowledge items:', error);
-    // Fallback to single item
-    return [{ title: defaultTitle, content }];
-  }
 };
 
 module.exports = {
-  getGeminiAI,
-  getEmbeddingModel,
-  getContentModel,
-  generateEmbedding,
-  extractKnowledgeItems
+    getGeminiAI,
+    getEmbeddingModel,
+    getContentModel,
+    generateEmbedding,
+    extractKnowledgeItems
 };

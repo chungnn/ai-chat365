@@ -137,7 +137,7 @@ exports.createKnowledge = async (req, res) => {
       const knowledgeItem = {
         title: item.title,
         content: item.content,
-        embedding: embedding ? embedding.values : null,
+        embedding: embedding ? embedding : null,
         createdAt: timestamp,
         updatedAt: timestamp
       };
