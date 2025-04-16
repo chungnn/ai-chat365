@@ -1,3 +1,5 @@
+const { elasticsearch } = require('../../../mgmt-api/src/config/config');
+
 require('dotenv').config();
 
 const config = {
@@ -24,7 +26,13 @@ const config = {
     maxOutputTokens: parseInt(process.env.GEMINI_MAX_OUTPUT_TOKENS || '800'),
     topP: parseFloat(process.env.GEMINI_TOP_P || '0.95'),
     topK: parseInt(process.env.GEMINI_TOP_K || '40')
-  }
+  },
+
+  elasticsearch: {
+    node: elasticsearch.node || 'http://localhost:9200',
+    username: elasticsearch.username || 'elastic',
+    password: elasticsearch.password || 'your-elastic-password',
+  },
 };
 
 module.exports = config;

@@ -10,20 +10,41 @@ const config = require('../config/config');
 // Singleton pattern for Gemini model initialization
 let genAI = null;
 let geminiModel = null;
+let embeddingModel = null;
+let contentModel = null;
+
+/**
+ * Initialize Google Generative AI and get instance
+ * @returns {Object} Google Generative AI instance
+ */
+const getGeminiAI = () => {
+  if (!genAI) {
+    try {
+      genAI = new GoogleGenerativeAI(config.geminiAI.apiKey);
+      console.log('Gemini AI initialized successfully');
+    } catch (error) {
+      console.error('Error initializing Gemini AI:', error);
+      throw error;
+    }
+  }
+  return genAI;
+};
 
 /**
  * Initialize Gemini AI and model if not already initialized
  * @returns {Object} - The initialized Gemini model
  */
 const getGeminiModel = () => {
-  if (!genAI) {
-    // Initialize Google Generative AI with API key from config
-    genAI = new GoogleGenerativeAI(config.geminiAI.apiKey);
-  }
-  
   if (!geminiModel) {
-    // Get the Gemini model using config settings
-    geminiModel = genAI.getGenerativeModel({ model: config.geminiAI.model });
+    try {
+      const ai = getGeminiAI();
+      // Get the Gemini model using config settings
+      geminiModel = ai.getGenerativeModel({ model: config.geminiAI.model });
+      console.log('Gemini model initialized successfully');
+    } catch (error) {
+      console.error('Error initializing Gemini model:', error);
+      throw error;
+    }
   }
   
   return geminiModel;
@@ -36,7 +57,8 @@ const getGeminiModel = () => {
  * @returns {string} - AI generated response
  */
 const generateResponse = async (messages, context = {}) => {
-  try {    // Get the latest user message
+  try {
+    // Get the latest user message
     const latestUserMessage = messages[messages.length - 1].content;
     
     // Get system instruction based on locale
@@ -66,7 +88,8 @@ Hãy trả lời câu hỏi kỹ thuật của người dùng một cách ngắn
     let formattedHistory = [];
     
     // Check if there are previous messages to include in history
-    if (messages.length > 1) {      // Get the last 10 messages, excluding the current message
+    if (messages.length > 1) {
+      // Get the last 10 messages, excluding the current message
       const recentMessages = messages.slice(-11, -1);
       
       // Find index of first user message
@@ -92,15 +115,55 @@ Hãy trả lời câu hỏi kỹ thuật của người dùng một cách ngắn
 
       console.log('formattedHistory', JSON.stringify(formattedHistory, null, 2));
     }
-      // Get language-specific prompt template based on the locale
+    
+    // Get language-specific prompt template based on the locale
     const promptTemplates = require('../config/promptTemplates');
-    
     const promptTemplate = promptTemplates[locale] || promptTemplates.en;
+      // ****** TÌM KIẾM TRONG CƠ SỞ TRI THỨC ELASTICSEARCH ******
+    // Tìm thông tin liên quan từ cơ sở tri thức Elasticsearch
+    console.log('Tìm kiếm thông tin liên quan từ Elasticsearch cho:', latestUserMessage);
+    let knowledgeContext = null;
     
-    // Prepare the user message with system instruction and proper language template
+    try {
+      // Sử dụng elasticsearchRagService để lấy thông tin liên quan với vector search
+      const elasticsearchRagService = require('./elasticsearchRagService');
+      
+      // Kiểm tra kết nối Elasticsearch trước khi tìm kiếm
+      const connectionStatus = await elasticsearchRagService.verifyElasticsearchConnection();
+      if (connectionStatus.connected && connectionStatus.indexExists) {
+        knowledgeContext = await elasticsearchRagService.getRelevantInformation(latestUserMessage);
+        console.log('Thông tin liên quan từ Elasticsearch:', knowledgeContext ? 'Tìm thấy' : 'Không tìm thấy');
+      } else {
+        console.warn('Elasticsearch không khả dụng, trạng thái:', connectionStatus);
+        
+        // Fallback sang ragService nếu Elasticsearch không khả dụng
+        console.log('Fallback sang file-based RAG...');
+        const ragService = require('./ragService');
+        knowledgeContext = await ragService.getRelevantInformation(latestUserMessage);
+        console.log('Thông tin liên quan từ file-based RAG:', knowledgeContext ? 'Tìm thấy' : 'Không tìm thấy');
+      }
+    } catch (error) {
+      console.error('Lỗi khi tìm kiếm thông tin trong cơ sở tri thức:', error);
+    }
+    
+    // Tạo tin nhắn cho người dùng với lời nhắc hệ thống và mẫu ngôn ngữ phù hợp
+    let userMessageText = systemInstruction + "\n\n" + promptTemplate;
+    
+    // Thêm ngữ cảnh từ cơ sở tri thức nếu có
+    if (knowledgeContext) {
+      if (locale === 'vi') {
+        userMessageText += `\n\nDưới đây là thông tin liên quan từ cơ sở tri thức của chúng tôi mà bạn có thể tham khảo để trả lời:\n\n${knowledgeContext}\n\n`;
+      } else {
+        userMessageText += `\n\nHere is relevant information from our knowledge base that you can refer to for answering:\n\n${knowledgeContext}\n\n`;
+      }
+    }
+    
+    // Thêm nội dung tin nhắn của người dùng
+    userMessageText += latestUserMessage;
+    
     const userMessage = {
       role: "user",
-      parts: [{ text: systemInstruction + "\n\n" + promptTemplate + latestUserMessage }]
+      parts: [{ text: userMessageText }]
     };
     
     // Get the Gemini model instance using our singleton pattern
@@ -133,7 +196,9 @@ Hãy trả lời câu hỏi kỹ thuật của người dùng một cách ngắn
         }
       ],
       history: formattedHistory
-    });    // Send the user message to Gemini and get response    
+    });
+    
+    // Send the user message to Gemini and get response    
     const result = await chat.sendMessage(userMessage.parts[0].text);
     const response = result.response.text();
     console.log('Gemini response:', response);
@@ -207,7 +272,66 @@ const shouldTransferToHuman = (messages, locale = 'en') => {
   };
 };
 
+
+/**
+ * Get embedding model for vector search
+ * @returns {Object} Embedding model instance
+ */
+const getEmbeddingModel = () => {
+    if (!embeddingModel) {
+        try {
+            const ai = getGeminiAI();
+            embeddingModel = ai.getGenerativeModel({ model: "models/embedding-001" });
+            console.log('Embedding model initialized successfully');
+        } catch (error) {
+            console.error('Error initializing embedding model:', error);
+            throw error;
+        }
+    }
+    return embeddingModel;
+};
+
+/**
+ * Get content generation model
+ * @returns {Object} Content generation model instance
+ */
+const getContentModel = () => {
+    if (!contentModel) {
+        try {
+            const ai = getGeminiAI();
+            contentModel = ai.getGenerativeModel({ model: config.geminiAI.model || 'gemini-2.0-flash' });
+            console.log('Content model initialized successfully');
+        } catch (error) {
+            console.error('Error initializing content model:', error);
+            throw error;
+        }
+    }
+    return contentModel;
+};
+
+/**
+ * Generate embeddings for text
+ * @param {string} text - Text to generate embeddings for
+ * @returns {Object} - Object containing embedding values
+ */
+const generateEmbedding = async (text) => {
+    try {
+        const model = getEmbeddingModel();
+        const result = await model.embedContent(text);
+        // Trả về trực tiếp mảng values
+        return result.embedding.values;
+    } catch (error) {
+        console.error('Error generating embedding:', error);
+        throw error;
+    }
+};
+
 module.exports = {
   generateResponse,
-  shouldTransferToHuman
+  shouldTransferToHuman,
+  getGeminiAI,
+  getGeminiModel,
+  getEmbeddingModel,
+  getContentModel,
+  generateEmbedding
 };

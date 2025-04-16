@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { v4: uuidv4 } = require('uuid');
 const aiService = require('../services/aiService');
 const ragService = require('../services/ragService');
+const elasticsearchRagService = require('../services/elasticsearchRagService');
 const analyticsService = require('../services/analyticsService');
 
 // Kiểm tra cấu hình Gemini
@@ -242,14 +243,13 @@ exports.sendMessage = async (req, res) => {
         if (!chat.metadata.topics.includes(intent.name)) {
           chat.metadata.topics.push(intent.name);
         }
-      }
-      console.log('[SOCKET DEBUG] Updated chat metadata:', chat.metadata);
+      }    console.log('[SOCKET DEBUG] Updated chat metadata:', chat.metadata);
     }
     
-    // Check if we should get information from RAG
-    // console.log('[SOCKET DEBUG] Getting relevant information from RAG');
-    // const relevantInfo = await ragService.getRelevantInformation(message);
-    // console.log('[SOCKET DEBUG] RAG relevant info found:', !!relevantInfo);
+    // Get relevant information from Elasticsearch knowledge base
+    console.log('[SOCKET DEBUG] Getting relevant information from Elasticsearch');
+    const relevantInfo = await elasticsearchRagService.getRelevantInformation(message);
+    console.log('[SOCKET DEBUG] Elasticsearch RAG relevant info found:', !!relevantInfo);
     
     // Prepare context for AI response generation
     const messagesForAI = chat.messages.map(msg => ({
