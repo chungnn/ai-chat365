@@ -87,24 +87,42 @@ const actions = {
       commit('SET_LOADING', false);
     }
   },
-  
-  // Create new knowledge item
+    // Create new knowledge item
   async createKnowledge({ commit, dispatch }, knowledge) {
     try {
       commit('SET_LOADING', true);
       
       const response = await axios.post(KNOWLEDGE_ENDPOINTS.CREATE_KNOWLEDGE, knowledge);
-        if (response.data && response.data.knowledge) {
-        commit('ADD_KNOWLEDGE_ITEM', response.data.knowledge);
-        dispatch('notification/showNotification', {
-          type: 'success',
-          message: 'Thêm tri thức mới thành công!'
-        }, { root: true });
-        return response.data.knowledge;
+      
+      if (response.data && response.data.success) {
+        // Xử lý khi response trả về một mảng items
+        if (response.data.items && Array.isArray(response.data.items)) {
+          // Thêm tất cả các items được tạo vào store
+          response.data.items.forEach(item => {
+            commit('ADD_KNOWLEDGE_ITEM', item);
+          });
+          
+          dispatch('notification/showNotification', {
+            type: 'success',
+            message: `Thêm ${response.data.items.length} tri thức mới thành công!`
+          }, { root: true });
+          
+          return response.data.items;
+        }
+        // Xử lý khi response trả về một knowledge item duy nhất
+        else if (response.data.knowledge) {
+          commit('ADD_KNOWLEDGE_ITEM', response.data.knowledge);
+          dispatch('notification/showNotification', {
+            type: 'success',
+            message: 'Thêm tri thức mới thành công!'
+          }, { root: true });
+          return response.data.knowledge;
+        } 
       } else {
         throw new Error('Phản hồi không hợp lệ từ máy chủ');
       }
-    } catch (error) {      console.error('Error creating knowledge:', error);
+    } catch (error) {
+      console.error('Error creating knowledge:', error);
       dispatch('notification/showNotification', {
         type: 'error',
         message: 'Đã xảy ra lỗi khi lưu tri thức. Vui lòng thử lại.'

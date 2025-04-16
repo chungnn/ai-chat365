@@ -1,7 +1,7 @@
 const { Client } = require('@elastic/elasticsearch');
 const config = require('../config/config');
 const { v4: uuidv4 } = require('uuid');
-const { GeminiEmbeddingModel } = require('@google/generative-ai');
+const aiService = require('../services/aiService');
 
 // Initialize Elasticsearch client
 const client = new Client({
@@ -15,13 +15,10 @@ const client = new Client({
   }
 });
 
-// Initialize embedding model for vector search
-let embeddingModel;
+// Initialize Google Generative AI and embedding model for vector search
+let embeddingModel = null;
 try {
-  embeddingModel = new GeminiEmbeddingModel({
-    apiKey: config.gemini.apiKey,
-    modelName: 'embedding-001',
-  });
+  embeddingModel = aiService.getEmbeddingModel();
 } catch (error) {
   console.error('Error initializing embedding model:', error);
 }
@@ -44,7 +41,7 @@ exports.getAllKnowledge = async (req, res) => {
         query: { match_all: {} }
       },
       size: 20 // Limit to 1000 items
-    });    const knowledgeItems = response.hits.hits.map(hit => ({
+    }); const knowledgeItems = response.hits.hits.map(hit => ({
       id: hit._id,
       title: hit._source.title || '',
       content: hit._source.content,
@@ -63,7 +60,7 @@ exports.getAllKnowledge = async (req, res) => {
 exports.getKnowledgeById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const response = await client.get({
       index: INDEX_NAME,
       id
@@ -71,7 +68,7 @@ exports.getKnowledgeById = async (req, res) => {
 
     if (!response || !response._source) {
       return res.status(404).json({ message: 'Knowledge item not found' });
-    }    const knowledgeItem = {
+    } const knowledgeItem = {
       id: response._id,
       title: response._source.title || '',
       content: response._source.content,
@@ -102,39 +99,90 @@ exports.createKnowledge = async (req, res) => {
     const indexExists = await client.indices.exists({ index: INDEX_NAME });
     if (!indexExists) {
       await createKnowledgeIndex();
+    }    // Use LLM to analyze content and extract knowledge items
+    let knowledgeItems = [];
+
+    try {
+      // Use the aiService to extract knowledge items
+      console.log('Extracting knowledge items using AI service');
+      knowledgeItems = await aiService.extractKnowledgeItems(content, title || '');
+      console.log(`Extracted ${knowledgeItems.length} knowledge items from content`);
+    } catch (llmError) {
+      console.error('Error using LLM to extract knowledge items:', llmError);
+      // Fallback to single item
+      knowledgeItems = [{ title: title || '', content }];
     }
 
-    // Generate embedding for the content
-    let embedding = null;
-    if (embeddingModel) {
-      try {
-        embedding = await embeddingModel.embedContent(content);
-      } catch (embeddingError) {
-        console.error('Error generating embedding:', embeddingError);
+
+    // Use bulk API for inserting multiple knowledge items
+    const operations = [];
+    const createdItems = [];    // Generate embeddings and prepare bulk operations
+    for (const item of knowledgeItems) {
+      // Generate embedding for each item
+      let embedding = null;
+      if (embeddingModel) {
+        try {
+          // Generate embedding from combined title and content for better semantic representation
+          const textToEmbed = `${item.title} ${item.content}`.trim();
+          const embeddingResult = await aiService.generateEmbedding(textToEmbed);
+          embedding = embeddingResult;
+        } catch (embeddingError) {
+          console.error('Error generating embedding:', embeddingError);
+        }
       }
+
+      const id = uuidv4();
+      const timestamp = new Date().toISOString();
+
+      const knowledgeItem = {
+        title: item.title,
+        content: item.content,
+        embedding: embedding ? embedding.values : null,
+        createdAt: timestamp,
+        updatedAt: timestamp
+      };
+
+      // Add to bulk operations
+      operations.push(
+        { index: { _index: INDEX_NAME, _id: id } },
+        knowledgeItem
+      );
+
+      // Track created items for response
+      createdItems.push({
+        id,
+        title: item.title,
+        content: item.content,
+        createdAt: timestamp,
+        updatedAt: timestamp
+      });
     }
 
-    const newKnowledgeItem = {
-      title: title || '',
-      content,
-      embedding: embedding ? embedding.values : null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    // Execute bulk operation if we have items
+    if (operations.length > 0) {
+      const bulkResponse = await client.bulk({
+        refresh: true,
+        operations
+      });
 
-    const id = uuidv4();
-    const response = await client.index({
-      index: INDEX_NAME,
-      id,
-      document: newKnowledgeItem
-    });    // Return the newly created knowledge item
-    return res.status(201).json({
-      id: response._id,
-      title: newKnowledgeItem.title,
-      content: newKnowledgeItem.content,
-      createdAt: newKnowledgeItem.createdAt,
-      updatedAt: newKnowledgeItem.updatedAt
-    });
+      if (bulkResponse.errors) {
+        console.error('Bulk operation had errors:', bulkResponse.items.filter(item => item.index.error));
+        return res.status(500).json({
+          message: 'Some knowledge items failed to index',
+          success: true,
+          items: createdItems.filter((_, i) => !bulkResponse.items[i].index.error),
+          errors: bulkResponse.items.filter(item => item.index.error).map(item => item.index.error)
+        });
+      }
+
+      return res.status(201).json({
+        success: true,
+        message: `Successfully created ${createdItems.length} knowledge items`,
+        items: createdItems
+      });
+    } else {
+      return res.status(400).json({ message: 'No valid knowledge items could be created' });
+    }
   } catch (error) {
     console.error('Error creating knowledge item:', error);
     return res.status(500).json({ message: 'Error creating knowledge item' });
@@ -185,14 +233,14 @@ exports.updateKnowledge = async (req, res) => {
     const updatedDoc = await client.get({
       index: INDEX_NAME,
       id
-    }); 
-    
-    
+    });
+
+
     return res.status(200).json({
-        success: true,
-        message: 'Knowledge updated successfully',
-        knowledge: updatedDoc._source
-      }
+      success: true,
+      message: 'Knowledge updated successfully',
+      knowledge: updatedDoc._source
+    }
     );
   } catch (error) {
     console.error('Error updating knowledge item:', error);
@@ -228,7 +276,7 @@ exports.deleteKnowledge = async (req, res) => {
 const createKnowledgeIndex = async () => {
   try {
     const indexExists = await client.indices.exists({ index: INDEX_NAME });
-    
+
     if (!indexExists) {
       const response = await client.indices.create({
         index: INDEX_NAME,
@@ -236,7 +284,7 @@ const createKnowledgeIndex = async () => {
           mappings: {
             properties: {
               content: { type: 'text' },
-              embedding: { 
+              embedding: {
                 type: 'dense_vector',
                 dims: 768, // Dimensions for Gemini embedding vector
                 index: true,
@@ -248,7 +296,7 @@ const createKnowledgeIndex = async () => {
           }
         }
       });
-      
+
       console.log('Knowledge index created:', response);
       return response;
     } else {
@@ -265,7 +313,7 @@ const createKnowledgeIndex = async () => {
 exports.searchKnowledge = async (req, res) => {
   try {
     const { query } = req.query;
-    
+
     if (!query || query.trim() === '') {
       return res.status(400).json({ message: 'Search query is required' });
     }
@@ -280,7 +328,7 @@ exports.searchKnowledge = async (req, res) => {
     if (embeddingModel) {
       try {
         const embedding = await embeddingModel.embedContent(query);
-        
+
         // Semantic search using vector similarity
         const vectorResponse = await client.search({
           index: INDEX_NAME,
