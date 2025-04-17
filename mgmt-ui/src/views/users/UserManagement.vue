@@ -1,9 +1,9 @@
 <template>
   <div class="user-management">
     <div class="page-header">
-      <h1>Quản Lý Người Dùng</h1>
+      <h1>{{ $t('users.userManagement') }}</h1>
       <button class="btn btn-primary" @click="openAddModal">
-        <span>+ Thêm Người Dùng</span>
+        <span>+ {{ $t('users.addUser') }}</span>
       </button>
     </div>
 
@@ -16,28 +16,26 @@
     </div>
 
     <div v-else-if="users.length === 0" class="empty-state">
-      <p>Chưa có người dùng nào. Hãy thêm người dùng mới!</p>
-    </div>
-
-    <div v-else class="user-list">
+      <p>{{ $t('users.noUsersYet') }}</p>
+    </div>    <div v-else class="user-list">
       <table class="table">
         <thead>
           <tr>
             <th>#</th>
-            <th>Tên</th>
-            <th>Email</th>
-            <th>Số điện thoại</th>
-            <th>Role</th>
-            <th>Trạng thái</th>
-            <th>Ngày Tạo</th>
-            <th>Thao tác</th>
+            <th>{{ $t('users.name') }}</th>
+            <th>{{ $t('users.userEmail') }}</th>
+            <th>{{ $t('users.phoneNumber') }}</th>
+            <th>{{ $t('users.role') }}</th>
+            <th>{{ $t('users.status') }}</th>
+            <th>{{ $t('users.createDate') }}</th>
+            <th>{{ $t('users.actions') }}</th>
           </tr>
         </thead>
         <tbody>          <tr v-for="(user, index) in users" :key="user._id">
             <td>{{ index + 1 }}</td>
             <td>{{ `${user.firstName || ''} ${user.lastName || ''}`.trim() }}</td>
             <td>{{ user.email }}</td>
-            <td>{{ user.phoneNumber || 'N/A' }}</td>
+            <td>{{ user.phoneNumber || $t('users.notAvailable') }}</td>
             <td>{{ user.role || 'User' }}</td>
             <td>
               <span 
@@ -46,41 +44,39 @@
                   user.isActive ? 'status-active' : 'status-inactive'
                 ]"
               >
-                {{ user.isActive ? 'Hoạt động' : 'Vô hiệu hóa' }}
+                {{ user.isActive ? $t('users.active') : $t('users.inactive') }}
               </span>
             </td>
             <td>{{ formatDate(user.createdAt) }}</td>
             <td>
               <button class="btn btn-sm btn-info" @click="openEditModal(user)">
-                Sửa
+                {{ $t('users.edit') }}
               </button>
               <button 
                 class="btn btn-sm ml-2" 
                 :class="user.isActive ? 'btn-warning' : 'btn-success'"
                 @click="toggleUserStatus(user)"
               >
-                {{ user.isActive ? 'Vô hiệu hóa' : 'Kích hoạt' }}
+                {{ user.isActive ? $t('users.deactivate') : $t('users.activate') }}
               </button>
               <button class="btn btn-sm btn-danger ml-2" @click="confirmDelete(user)">
-                Xóa
+                {{ $t('users.delete') }}
               </button>
             </td>
           </tr>
         </tbody>
       </table>
-    </div>
-
-    <!-- Add/Edit User Modal -->
+    </div>    <!-- Add/Edit User Modal -->
     <div class="modal" v-if="showModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>{{ isEditing ? 'Sửa Thông Tin Người Dùng' : 'Thêm Người Dùng' }}</h2>
+          <h2>{{ isEditing ? $t('users.editUserInfo') : $t('users.addUser') }}</h2>
           <button class="close-button" @click="closeModal">&times;</button>
         </div>
         <div class="modal-body">
           <form @submit.prevent="submitForm">            
             <div class="form-group">
-              <label for="firstName">Họ:</label>
+              <label for="firstName">{{ $t('users.firstName') }}:</label>
               <input
                 type="text"
                 id="firstName"
@@ -90,7 +86,7 @@
               />
             </div>
             <div class="form-group">
-              <label for="lastName">Tên:</label>
+              <label for="lastName">{{ $t('users.lastName') }}:</label>
               <input
                 type="text"
                 id="lastName"
@@ -100,7 +96,7 @@
               />
             </div>
             <div class="form-group">
-              <label for="email">Email:</label>
+              <label for="email">{{ $t('users.userEmail') }}:</label>
               <input
                 type="email"
                 id="email"
@@ -109,7 +105,7 @@
                 required
               />
             </div>            <div class="form-group">
-              <label for="phoneNumber">Số điện thoại:</label>
+              <label for="phoneNumber">{{ $t('users.phoneNumber') }}:</label>
               <input
                 type="text"
                 id="phoneNumber"
@@ -118,7 +114,7 @@
               />
             </div>
             <div class="form-group" v-if="!isEditing">
-              <label for="password">Mật khẩu:</label>
+              <label for="password">{{ $t('auth.password') }}:</label>
               <input
                 type="password"
                 id="password"
@@ -128,56 +124,54 @@
               />
             </div>
             <div class="form-group">
-              <label for="isActive">Trạng thái:</label>
+              <label for="isActive">{{ $t('users.status') }}:</label>
               <select
                 id="isActive"
                 v-model="form.isActive"
                 class="form-control"
               >
-                <option :value="true">Hoạt động</option>
-                <option :value="false">Vô hiệu hóa</option>
+                <option :value="true">{{ $t('users.active') }}</option>
+                <option :value="false">{{ $t('users.inactive') }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="role">Vai trò:</label>
+              <label for="role">{{ $t('users.role') }}:</label>
               <select
                 id="role"
                 v-model="form.role"
                 class="form-control"
               >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-                <option value="manager">Manager</option>
+                <option value="user">{{ $t('users.user') }}</option>
+                <option value="admin">{{ $t('users.admin') }}</option>
+                <option value="manager">{{ $t('users.manager') }}</option>
               </select>
             </div>
             <div class="form-buttons">
               <button type="button" class="btn btn-secondary" @click="closeModal">
-                Hủy
+                {{ $t('users.cancel') }}
               </button>
               <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-                {{ isSubmitting ? 'Đang xử lý...' : 'Lưu' }}
+                {{ isSubmitting ? $t('users.processing') : $t('users.save') }}
               </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
+    </div>    <!-- Delete Confirmation Modal -->
     <div class="modal" v-if="showDeleteModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Xác nhận xóa</h2>
+          <h2>{{ $t('users.deleteUser') }}</h2>
           <button class="close-button" @click="closeDeleteModal">&times;</button>
         </div>
         <div class="modal-body">
-          <p>Bạn có chắc chắn muốn xóa người dùng "{{ selectedUser ? `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim() : '' }}" không?</p>
+          <p>{{ $t('users.confirmDeleteUser', { name: selectedUser ? `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim() : '' }) }}</p>
           <div class="form-buttons">
             <button type="button" class="btn btn-secondary" @click="closeDeleteModal">
-              Hủy
+              {{ $t('users.cancel') }}
             </button>
             <button type="button" class="btn btn-danger" :disabled="isDeleting" @click="deleteUser">
-              {{ isDeleting ? 'Đang xóa...' : 'Xóa' }}
+              {{ isDeleting ? $t('users.deleting') : $t('users.delete') }}
             </button>
           </div>
         </div>
@@ -189,12 +183,14 @@
 <script>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'UserManagement',
   
   setup() {
     const store = useStore();
+    useI18n(); 
     
     const showModal = ref(false);
     const showDeleteModal = ref(false);

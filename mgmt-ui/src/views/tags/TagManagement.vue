@@ -1,21 +1,20 @@
 <template>
   <div class="tag-management">
     <div class="header">
-      <h2 class="page-title">Tag Management</h2>
+      <h2 class="page-title">{{ $t('tags.tagManagement') }}</h2>
       <button class="btn btn-primary" @click="openTagForm()">
-        <i class="fas fa-plus"></i> Add New Tag
+        <i class="fas fa-plus"></i> {{ $t('tags.addNewTag') }}
       </button>
     </div>
 
     <div class="content-section">
       <div v-if="loading" class="loading-state">
-        <p>Loading tags...</p>
+        <p>{{ $t('tags.loadingTags') }}</p>
       </div>
       
       <div v-else-if="tags.length === 0" class="empty-state">
-        <p>No tags have been created yet. Create your first tag to get started.</p>
-      </div>
-      
+        <p>{{ $t('tags.noTagsYet') }}</p>
+      </div>      
       <div v-else class="tags-list">
         <div v-for="tag in tags" :key="tag._id" class="tag-item">
           <div class="tag-color" :style="{ backgroundColor: tag.color || '#e2e8f0' }"></div>
@@ -30,21 +29,19 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Tag Form Modal -->
+    </div>    <!-- Tag Form Modal -->
     <div v-if="showTagForm" class="modal-overlay" @click="closeTagForm">
       <div class="modal-content" @click.stop>
-        <h3>{{ isEditing ? 'Edit Tag' : 'New Tag' }}</h3>
+        <h3>{{ isEditing ? $t('tags.editTag') : $t('tags.newTag') }}</h3>
         
         <form @submit.prevent="saveTag">
           <div class="form-group">
-            <label for="tagName">Tag Name</label>
+            <label for="tagName">{{ $t('tags.tagName') }}</label>
             <input
               type="text"
               id="tagName"
               v-model="tagForm.name"
-              placeholder="Enter tag name"
+              :placeholder="$t('tags.enterTagName')"
               required
               class="form-control"
               :class="{ 'is-invalid': tagNameError }"
@@ -55,7 +52,7 @@
           </div>
           
           <div class="form-group">
-            <label for="tagColor">Tag Color</label>
+            <label for="tagColor">{{ $t('tags.tagColor') }}</label>
             <div class="color-picker-wrapper">
               <input
                 type="color"
@@ -69,28 +66,25 @@
           
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" @click="closeTagForm">
-              Cancel
+              {{ $t('tags.cancel') }}
             </button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
-              {{ saving ? 'Saving...' : 'Save Tag' }}
+              {{ saving ? $t('tags.saving') : $t('tags.saveTag') }}
             </button>
           </div>
         </form>
       </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
+    </div>    <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteConfirm" class="modal-overlay" @click="cancelDelete">
       <div class="modal-content" @click.stop>
-        <h3>Delete Tag</h3>
+        <h3>{{ $t('tags.deleteTag') }}</h3>
         <p>
-          Are you sure you want to delete the tag "{{ tagToDelete?.name }}"?
-          This action cannot be undone.
+          {{ $t('tags.confirmDeleteTag', { name: tagToDelete?.name }) }}
         </p>
         
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" @click="cancelDelete">
-            Cancel
+            {{ $t('tags.cancel') }}
           </button>
           <button
             type="button"
@@ -98,7 +92,7 @@
             :disabled="deleting"
             @click="deleteTag"
           >
-            {{ deleting ? 'Deleting...' : 'Delete Tag' }}
+            {{ deleting ? $t('tags.deleting') : $t('tags.deleteTag') }}
           </button>
         </div>
       </div>
@@ -109,12 +103,14 @@
 <script>
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'TagManagement',
   
   setup() {
     const store = useStore();
+    useI18n(); 
     
     const tags = computed(() => store.getters['tags/allTags']);
     const loading = computed(() => store.state.tags.loading);

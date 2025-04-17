@@ -1,9 +1,9 @@
 <template>
   <div class="category-management">
     <div class="page-header">
-      <h1>Quản Lý Danh Mục</h1>
+      <h1>{{ $t('categories.categoryManagement') }}</h1>
       <button class="btn btn-primary" @click="openAddModal">
-        <span>+ Thêm Danh Mục</span>
+        <span>+ {{ $t('categories.addCategory') }}</span>
       </button>
     </div>
 
@@ -16,18 +16,16 @@
     </div>
 
     <div v-else-if="categories.length === 0" class="empty-state">
-      <p>Chưa có danh mục nào. Hãy thêm danh mục mới!</p>
-    </div>
-
-    <div v-else class="category-list">
+      <p>{{ $t('categories.noCategoriesYet') }}</p>
+    </div>    <div v-else class="category-list">
       <table class="table">
         <thead>
           <tr>
             <th>#</th>
-            <th>Tên Danh Mục</th>
-            <th>Mô tả</th>
-            <th>Ngày Tạo</th>
-            <th>Thao tác</th>
+            <th>{{ $t('categories.categoryName') }}</th>
+            <th>{{ $t('categories.categoryDescription') }}</th>
+            <th>{{ $t('categories.createdAt') }}</th>
+            <th>{{ $t('categories.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -38,28 +36,26 @@
             <td>{{ formatDate(category.createdAt) }}</td>
             <td>
               <button class="btn btn-sm btn-info" @click="openEditModal(category)">
-                Sửa
+                {{ $t('categories.edit') }}
               </button>
               <button class="btn btn-sm btn-danger ml-2" @click="confirmDelete(category)">
-                Xóa
+                {{ $t('categories.delete') }}
               </button>
             </td>
           </tr>
         </tbody>
       </table>
-    </div>
-
-    <!-- Add/Edit Category Modal -->
+    </div>    <!-- Add/Edit Category Modal -->
     <div class="modal" v-if="showModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>{{ isEditing ? 'Sửa Danh Mục' : 'Thêm Danh Mục' }}</h2>
+          <h2>{{ isEditing ? $t('categories.editingCategory') : $t('categories.addCategory') }}</h2>
           <button class="close-button" @click="closeModal">&times;</button>
         </div>
         <div class="modal-body">
           <form @submit.prevent="submitForm">
             <div class="form-group">
-              <label for="name">Tên Danh Mục:</label>
+              <label for="name">{{ $t('categories.categoryName') }}:</label>
               <input
                 type="text"
                 id="name"
@@ -69,7 +65,7 @@
               />
             </div>
             <div class="form-group">
-              <label for="description">Mô tả:</label>
+              <label for="description">{{ $t('categories.categoryDescription') }}:</label>
               <textarea
                 id="description"
                 v-model="form.description"
@@ -79,32 +75,30 @@
             </div>
             <div class="form-buttons">
               <button type="button" class="btn btn-secondary" @click="closeModal">
-                Hủy
+                {{ $t('categories.cancel') }}
               </button>
               <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-                {{ isSubmitting ? 'Đang xử lý...' : 'Lưu' }}
+                {{ isSubmitting ? $t('categories.processing') : $t('categories.save') }}
               </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
+    </div>    <!-- Delete Confirmation Modal -->
     <div class="modal" v-if="showDeleteModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Xác nhận xóa</h2>
+          <h2>{{ $t('categories.deleteCategory') }}</h2>
           <button class="close-button" @click="closeDeleteModal">&times;</button>
         </div>
         <div class="modal-body">
-          <p>Bạn có chắc chắn muốn xóa danh mục "{{ selectedCategory?.name }}" không?</p>
+          <p>{{ $t('categories.confirmDeleteCategory', { name: selectedCategory?.name }) }}</p>
           <div class="form-buttons">
             <button type="button" class="btn btn-secondary" @click="closeDeleteModal">
-              Hủy
+              {{ $t('categories.cancel') }}
             </button>
             <button type="button" class="btn btn-danger" :disabled="isDeleting" @click="deleteCategory">
-              {{ isDeleting ? 'Đang xóa...' : 'Xóa' }}
+              {{ isDeleting ? $t('categories.processing') : $t('categories.delete') }}
             </button>
           </div>
         </div>
@@ -116,12 +110,14 @@
 <script>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'CategoryManagement',
   
   setup() {
     const store = useStore();
+    useI18n(); // Make i18n available to the template without assigning it to a variable
     
     const showModal = ref(false);
     const showDeleteModal = ref(false);
