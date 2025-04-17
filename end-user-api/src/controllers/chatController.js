@@ -126,7 +126,7 @@ exports.initSession = async (req, res) => {
       messages: [
         {
           role: 'assistant',
-          content: 'Xin chào! Tôi là trợ lý hỗ trợ kỹ thuật. Tôi có thể giúp bạn giải quyết các vấn đề kỹ thuật, hướng dẫn sử dụng dịch vụ hoặc trả lời các thắc mắc liên quan đến sản phẩm. Bạn cần hỗ trợ vấn đề gì ạ?'
+          content: greeting
         }
       ]
     });

@@ -274,7 +274,8 @@ export default {
       user: 'auth/user',
       typingUsers: 'chat/typingUsers',
       sessionId: 'chat/getSessionId',
-      chatStatus: 'chat/getStatus'
+      chatStatus: 'chat/getStatus',
+      ticketId: 'chat/getTicketId'
     }),    statusText() {
       const statusMap = {
         'open': this.$t('chat.status.new'),

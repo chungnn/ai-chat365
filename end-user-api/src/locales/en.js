@@ -24,8 +24,7 @@ module.exports = {
     tokenExpired: 'Authentication token expired',
     tokenInvalid: 'Invalid authentication token',
     accountCreated: 'Account created successfully'
-  },
-  chat: {
+  },  chat: {
     sessionCreated: 'Chat session created successfully',
     messageProcessed: 'Message processed successfully',
     messageFailed: 'Failed to process message',
@@ -35,6 +34,7 @@ module.exports = {
     transferFailed: 'Failed to transfer to human agent',
     chatEnded: 'Chat session ended',
     chatHistory: 'Chat history retrieved successfully',
+    greeting: 'Hello! I am an AI assistant. Your support ticket ID is: {{ticketId}}. How can I help you today?',
     aiGreeting: 'Hello! How can I assist you today?',
     aiTransferSuggestion: 'I suggest transferring to a human agent for better assistance with your issue.',
     aiError: 'I apologize, but I encountered an error processing your request. Please try again or contact support.'
