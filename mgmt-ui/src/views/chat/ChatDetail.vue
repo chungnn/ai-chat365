@@ -94,8 +94,7 @@
           <h3 class="tools-title">Chat Tools</h3>
             <!-- Assignment section (updated) -->
           <div class="tool-card">
-            <h4 class="tool-header">Assign Chat</h4>
-            <div class="tool-content">
+            <h4 class="tool-header">Assign Chat</h4>            <div class="tool-content">
               <select 
                 v-model="selectedAgentId" 
                 class="form-control"
@@ -104,7 +103,7 @@
               >
                 <option value="">Select Agent</option>
                 <option 
-                  v-for="user in agents" 
+                  v-for="user in adminAgents" 
                   :key="user._id" 
                   :value="user._id"
                 >
@@ -276,6 +275,11 @@ export default {
       const currentChat = computed(() => store.getters['chat/currentChat']);
     const socket = computed(() => store.state.chat.socket);
     const agents = computed(() => store.getters['chat/agents']);
+    
+    // Lọc ra các agent có role là admin
+    const adminAgents = computed(() => {
+      return agents.value.filter(user => user.role === 'admin');
+    });
     
     const chatUser = computed(() => {
       if (!currentChat.value || !currentChat.value.user) {
@@ -733,8 +737,7 @@ export default {
     
     onUpdated(() => {
       scrollToBottom();
-    });
-      return {
+    });      return {
       loading,
       sending,
       currentChat,
@@ -761,6 +764,7 @@ export default {
       goToTagManagement,
       // Agent assignment
       agents,
+      adminAgents,
       selectedAgentId,
       assigningChat,
       autoAssignToAgent,

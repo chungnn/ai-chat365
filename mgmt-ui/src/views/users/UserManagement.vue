@@ -27,6 +27,7 @@
             <th>Tên</th>
             <th>Email</th>
             <th>Số điện thoại</th>
+            <th>Role</th>
             <th>Trạng thái</th>
             <th>Ngày Tạo</th>
             <th>Thao tác</th>
@@ -37,6 +38,7 @@
             <td>{{ `${user.firstName || ''} ${user.lastName || ''}`.trim() }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.phoneNumber || 'N/A' }}</td>
+            <td>{{ user.role || 'User' }}</td>
             <td>
               <span 
                 :class="[
@@ -136,6 +138,18 @@
                 <option :value="false">Vô hiệu hóa</option>
               </select>
             </div>
+            <div class="form-group">
+              <label for="role">Vai trò:</label>
+              <select
+                id="role"
+                v-model="form.role"
+                class="form-control"
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+              </select>
+            </div>
             <div class="form-buttons">
               <button type="button" class="btn btn-secondary" @click="closeModal">
                 Hủy
@@ -194,7 +208,8 @@ export default {
       email: '',
       phoneNumber: '',
       password: '',
-      isActive: true
+      isActive: true,
+      role: 'user'
     });
     
     // Computed properties
@@ -220,7 +235,8 @@ export default {
         email: '',
         phoneNumber: '',
         password: '',
-        isActive: true
+        isActive: true,
+        role: 'user'
       };
       showModal.value = true;
     };
@@ -233,7 +249,8 @@ export default {
         lastName: user.lastName || '',
         email: user.email,
         phoneNumber: user.phoneNumber || '',
-        isActive: user.isActive
+        isActive: user.isActive,
+        role: user.role || 'user'
       };
       showModal.value = true;
     };
