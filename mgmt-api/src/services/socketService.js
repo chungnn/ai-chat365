@@ -12,8 +12,8 @@ const authenticateSocket = async (socket, next) => {
       return next(new Error('Authentication error: No token provided'));
     }
     
-    // Verify token
-    const decoded = jwt.verify(token, config.jwt.secret);
+    // Verify token using RS256 algorithm with public key
+    const decoded = jwt.verify(token, config.jwt.publicKey, { algorithms: ['RS256'] });
     
     // Find user by id
     const user = await User.findById(decoded.id);

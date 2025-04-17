@@ -232,13 +232,33 @@ export default {  common: {
     unauthorized: 'Unauthorized access',
     serverError: 'Server error',
     goBack: 'Go back to dashboard'
-  },
-  urlPreview: {
+  },  urlPreview: {
     loading: 'Loading...',
     errorFetching: 'Error fetching URL preview:',
     video: 'Video:',
     youtube: 'YouTube',
     vimeo: 'Vimeo',
     dailymotion: 'Dailymotion'
+  },
+  knowledge: {
+    management: 'Knowledge Management',
+    addNew: 'Add New Knowledge',
+    edit: 'Edit Knowledge',
+    search: 'Search knowledge...',
+    loading: 'Loading data...',
+    error: 'Error loading knowledge items',
+    empty: 'No knowledge items found.',
+    confirmDelete: 'Are you sure you want to delete this knowledge item?',
+    title: 'Knowledge Title',
+    content: 'Knowledge Content',
+    contentPlaceholder: 'Enter knowledge content...',
+    contentDescription: 'Knowledge content (title will be automatically extracted)',
+    contentEditDescription: 'Knowledge content',
+    titlePlaceholder: 'Enter knowledge title...',
+    updated: 'Updated',
+    add: 'Add',
+    update: 'Update',
+    cancel: 'Cancel',
+    delete: 'Delete'
   }
 }

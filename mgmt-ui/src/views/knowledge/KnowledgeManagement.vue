@@ -1,9 +1,9 @@
 <template>
   <div class="knowledge-management">
     <div class="header-area">
-      <h1>Quản Lý Tri Thức</h1>
+      <h1>{{ $t('knowledge.management') }}</h1>
       <button @click="openAddModal" class="btn btn-primary">
-        <span class="icon">➕</span> Thêm Tri Thức Mới
+        <span class="icon">➕</span> {{ $t('knowledge.addNew') }}
       </button>
     </div>
 
@@ -11,27 +11,24 @@
       <input 
         type="text" 
         v-model="searchTerm" 
-        placeholder="Tìm kiếm tri thức..." 
+        placeholder="{{ $t('knowledge.search') }}" 
         class="search-input"
         @input="handleSearch"
       />
     </div>
 
-    <div v-if="isLoading" class="loading-container">
-      <div class="spinner"></div>
-      <p>Đang tải dữ liệu...</p>
+    <div v-if="isLoading" class="loading-container">      <div class="spinner"></div>
+      <p>{{ $t('knowledge.loading') }}</p>
     </div>
 
     <div v-else-if="hasError" class="error-container">
       <p>{{ hasError }}</p>
-      <button @click="fetchKnowledge" class="btn btn-secondary">Thử lại</button>
+      <button @click="fetchKnowledge" class="btn btn-secondary">{{ $t('common.submit') }}</button>
     </div>
 
     <div v-else-if="knowledgeItems.length === 0" class="empty-container">
-      <p>Không có tri thức nào được tìm thấy.</p>
-    </div>
-
-    <div v-else class="knowledge-list">      <div v-for="item in knowledgeItems" :key="item.id" class="knowledge-card">
+      <p>{{ $t('knowledge.empty') }}</p>
+    </div>    <div v-else class="knowledge-list">      <div v-for="item in knowledgeItems" :key="item.id" class="knowledge-card">
         <div class="knowledge-header">
           <h3>{{ item.title || truncateText(item.content, 50) }}</h3>
           <div class="knowledge-actions">
@@ -43,64 +40,60 @@
           <p class="knowledge-text">{{ truncateText(item.content, 150) }}</p>
         </div>
         <div class="knowledge-footer">
-          <span class="timestamp">Cập nhật: {{ formatDate(item.updatedAt) }}</span>
+          <span class="timestamp">{{ $t('knowledge.updated') }}: {{ formatDate(item.updatedAt) }}</span>
         </div>
       </div>
-    </div>
-
-    <!-- Modal for adding/editing knowledge -->
+    </div>    <!-- Modal for adding/editing knowledge -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-container">
         <div class="modal-header">
-          <h2>{{ isEditing ? 'Chỉnh Sửa Tri Thức' : 'Thêm Tri Thức Mới' }}</h2>
+          <h2>{{ isEditing ? $t('knowledge.edit') : $t('knowledge.addNew') }}</h2>
           <button @click="closeModal" class="btn-close">×</button>
         </div>        <div class="modal-body">          
           <form @submit.prevent="submitKnowledge">
             <!-- Chỉ hiển thị trường tiêu đề khi đang chỉnh sửa -->
             <div class="form-group" v-if="isEditing">
-              <label for="title">Tiêu đề tri thức</label>
+              <label for="title">{{ $t('knowledge.title') }}</label>
               <input 
                 id="title" 
                 v-model="knowledgeForm.title" 
                 required 
-                placeholder="Nhập tiêu đề tri thức..."
+                :placeholder="$t('knowledge.titlePlaceholder')"
                 type="text"
               />
             </div>
             
             <div class="form-group">
-              <label for="content">{{ isEditing ? 'Nội dung tri thức' : 'Nội dung tri thức (tiêu đề sẽ được tự động trích xuất)' }}</label>
+              <label for="content">{{ isEditing ? $t('knowledge.contentEditDescription') : $t('knowledge.contentDescription') }}</label>
               <textarea 
                 id="content" 
                 v-model="knowledgeForm.content" 
                 required 
-                placeholder="Nhập nội dung tri thức..."
+                :placeholder="$t('knowledge.contentPlaceholder')"
                 rows="8"
               ></textarea>
             </div>
             
             <div class="form-actions">
-              <button type="button" @click="closeModal" class="btn btn-secondary">Hủy</button>
+              <button type="button" @click="closeModal" class="btn btn-secondary">{{ $t('knowledge.cancel') }}</button>
               <button type="submit" class="btn btn-primary" :disabled="isLoading">
-                {{ isEditing ? 'Cập Nhật' : 'Thêm Mới' }}
+                {{ isEditing ? $t('knowledge.update') : $t('knowledge.add') }}
               </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
-
-    <!-- Confirmation dialog -->
+    </div>    <!-- Confirmation dialog -->
     <div v-if="showDeleteConfirmation" class="modal-overlay">
       <div class="modal-container confirmation-dialog">
         <div class="modal-header">
-          <h2>Xác nhận xóa</h2>
+          <h2>{{ $t('common.confirmDelete') }}</h2>
         </div>
         <div class="modal-body">
-          <p>Bạn có chắc chắn muốn xóa tri thức này không?</p>
+          <p>{{ $t('knowledge.confirmDelete') }}</p>
           <div class="form-actions">
-            <button @click="cancelDelete" class="btn btn-secondary">Hủy</button>
-            <button @click="deleteKnowledge" class="btn btn-danger" :disabled="isLoading">Xóa</button>
+            <button @click="cancelDelete" class="btn btn-secondary">{{ $t('knowledge.cancel') }}</button>
+            <button @click="deleteKnowledge" class="btn btn-danger" :disabled="isLoading">{{ $t('knowledge.delete') }}</button>
           </div>
         </div>
       </div>
@@ -111,12 +104,12 @@
 <script>
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { useI18n } from 'vue-i18n';
 
 export default {
-  name: 'KnowledgeManagement',
-  
-  setup() {
+  name: 'KnowledgeManagement',  setup() {
     const store = useStore();
+    const { t } = useI18n();
     const searchTerm = ref('');
     const showModal = ref(false);
     const isEditing = ref(false);
@@ -224,8 +217,7 @@ export default {
     onMounted(() => {
       fetchKnowledge();
     });
-    
-    return {
+      return {
       knowledgeItems,
       isLoading,
       hasError,
@@ -244,7 +236,8 @@ export default {
       cancelDelete,
       deleteKnowledge,
       truncateText,
-      formatDate
+      formatDate,
+      t
     };
   }
 };

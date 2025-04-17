@@ -232,13 +232,33 @@ export default {  common: {
     unauthorized: 'Truy cập không được phép',
     serverError: 'Lỗi máy chủ',
     goBack: 'Quay lại bảng điều khiển'
-  },
-  urlPreview: {
+  },  urlPreview: {
     loading: 'Đang tải...',
     errorFetching: 'Lỗi khi tải xem trước URL:',
     video: 'Video:',
     youtube: 'YouTube',
     vimeo: 'Vimeo',
     dailymotion: 'Dailymotion'
+  },
+  knowledge: {
+    management: 'Quản Lý Tri Thức',
+    addNew: 'Thêm Tri Thức Mới',
+    edit: 'Chỉnh Sửa Tri Thức',
+    search: 'Tìm kiếm tri thức...',
+    loading: 'Đang tải dữ liệu...',
+    error: 'Lỗi khi tải dữ liệu tri thức',
+    empty: 'Không có tri thức nào được tìm thấy.',
+    confirmDelete: 'Bạn có chắc chắn muốn xóa tri thức này không?',
+    title: 'Tiêu đề tri thức',
+    content: 'Nội dung tri thức',
+    contentPlaceholder: 'Nhập nội dung tri thức...',
+    contentDescription: 'Nội dung tri thức (tiêu đề sẽ được tự động trích xuất)',
+    contentEditDescription: 'Nội dung tri thức',
+    titlePlaceholder: 'Nhập tiêu đề tri thức...',
+    updated: 'Cập nhật',
+    add: 'Thêm Mới',
+    update: 'Cập Nhật',
+    cancel: 'Hủy',
+    delete: 'Xóa'
   }
 }
