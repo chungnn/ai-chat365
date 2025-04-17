@@ -12,6 +12,8 @@ An open source AI-based helpdesk support system with a focus on chat functionali
 - Live agent handoff when AI can't resolve issues
 - Ticket management and tracking system
 - Comprehensive analytics and reporting on support metrics
+- **NEW**: Enhanced security with RS256 JWT authentication
+- **NEW**: Full multi-language support throughout the application
 
 ## Project Structure
 This project consists of four main components:
@@ -98,6 +100,11 @@ The AI Helpdesk Support System features a sophisticated knowledge management sys
 - Automated content categorization
 - Performance analytics on knowledge base usage
 - Relevance feedback system for continuous improvement
+
+## Recent Updates
+- **Enhanced Security**: Implemented RS256 JWT authentication using RSA key pairs for more secure token generation and validation
+- **Multi-language Support**: Added comprehensive internationalization (i18n) throughout the application, with initial support for English and Vietnamese languages
+- **Improved UI Components**: Refactored UI components to use translation keys instead of hard-coded text
 
 ## Contributing
 This is an open source project and contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
