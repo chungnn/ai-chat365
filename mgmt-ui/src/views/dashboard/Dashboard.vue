@@ -1,7 +1,6 @@
-<template>
-  <div class="dashboard">
+<template>  <div class="dashboard">
     <h2 class="page-title">
-      Dashboard
+      {{ t('common.dashboard') }}
     </h2>
     
     <div class="stats-grid">
@@ -11,17 +10,16 @@
         </div>
         <div class="stat-content">
           <h3>{{ chatStats.total }}</h3>
-          <p>Total Chats</p>
+          <p>{{ t('dashboard.totalChats') }}</p>
         </div>
       </div>
-      
-      <div class="stat-card">
+        <div class="stat-card">
         <div class="stat-icon">
           🔔
         </div>
         <div class="stat-content">
           <h3>{{ chatStats.active }}</h3>
-          <p>Active Chats</p>
+          <p>{{ t('dashboard.activeChats') }}</p>
         </div>
       </div>
       
@@ -31,7 +29,7 @@
         </div>
         <div class="stat-content">
           <h3>{{ chatStats.resolved }}</h3>
-          <p>Resolved</p>
+          <p>{{ t('dashboard.resolved') }}</p>
         </div>
       </div>
       
@@ -41,47 +39,44 @@
         </div>
         <div class="stat-content">
           <h3>{{ chatStats.avgResponseTime }}m</h3>
-          <p>Avg Response Time</p>
+          <p>{{ t('dashboard.avgResponseTime') }}</p>
         </div>
       </div>
     </div>
-    
-    <div class="recent-activity">
+      <div class="recent-activity">
       <div class="card">
         <h3 class="card-title">
-          Recent Chats
+          {{ t('dashboard.recentChats') }}
         </h3>
         <div
           v-if="loading"
           class="loading-container"
         >
-          <p>Loading...</p>
+          <p>{{ t('dashboard.loading') }}</p>
         </div>
         <div
           v-else-if="recentChats.length === 0"
           class="empty-state"
         >
-          <p>No recent chat activity</p>
-        </div>
-        <table
+          <p>{{ t('dashboard.noData') }}</p>
+        </div>        <table
           v-else
           class="table"
         >
           <thead>
             <tr>
-              <th>User</th>
-              <th>Last Message</th>
-              <th>Time</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th>{{ t('dashboard.user') }}</th>
+              <th>{{ t('dashboard.lastMessage') }}</th>
+              <th>{{ t('dashboard.time') }}</th>
+              <th>{{ t('dashboard.status') }}</th>
+              <th>{{ t('dashboard.action') }}</th>
             </tr>
-          </thead>
-          <tbody>
+          </thead>          <tbody>
             <tr
               v-for="chat in recentChats"
               :key="chat._id"
             >
-              <td>{{ chat.user?.name || 'Anonymous' }}</td>
+              <td>{{ chat.user?.name || t('dashboard.anonymous') }}</td>
               <td class="message-preview">
                 {{ getLastMessage(chat) }}
               </td>
@@ -96,7 +91,7 @@
                   :to="`/chats/${chat._id}`"
                   class="btn btn-sm btn-primary"
                 >
-                  View
+                  {{ t('dashboard.view') }}
                 </router-link>
               </td>
             </tr>
@@ -110,12 +105,14 @@
 <script>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'DashboardView',
   setup() {
     const store = useStore();
     const loading = ref(true);
+    const { t } = useI18n();
     
     // Mock data for demo purposes - in a real app this would come from the API
     const chatStats = ref({
@@ -132,10 +129,9 @@ export default {
         .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
         .slice(0, 5);
     });
-    
-    const getLastMessage = (chat) => {
+      const getLastMessage = (chat) => {
       if (!chat.messages || chat.messages.length === 0) {
-        return 'No messages';
+        return t('dashboard.noMessages');
       }
       
       const lastMessage = chat.messages[chat.messages.length - 1];
@@ -161,24 +157,23 @@ export default {
           active: chats.filter(c => c.status === 'active').length,
           resolved: chats.filter(c => c.status === 'resolved').length,
           avgResponseTime: 3 // Mock value, would be calculated from real data
-        };
-      } catch (error) {
+        };      } catch (error) {
         console.error('Failed to fetch dashboard data', error);
         store.dispatch('notification/showNotification', {
           type: 'error',
-          message: 'Failed to load dashboard data'
+          message: t('dashboard.failedToLoad')
         });
       } finally {
         loading.value = false;
       }
     });
-    
-    return {
+      return {
       loading,
       chatStats,
       recentChats,
       getLastMessage,
-      formatTime
+      formatTime,
+      t
     };
   }
 };

@@ -17,9 +17,11 @@ const chatRoutes = require('./src/routes/chatRoutes');
 const tagRoutes = require('./src/routes/tagRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const knowledgeRoutes = require('./src/routes/knowledgeRoutes');
+const languageRoutes = require('./src/routes/languageRoutes');
 
 // Import middleware
 const { authenticate } = require('./src/middleware/auth');
+const languageMiddleware = require('./src/middleware/language');
 
 // Create Express app
 const app = express();
@@ -73,6 +75,9 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Áp dụng middleware ngôn ngữ cho mọi request
+app.use(languageMiddleware);
+
 // Connect to MongoDB with retry mechanism
 const connectMongoDB = async (retries = 5, delay = 5000) => {
   for (let i = 0; i < retries; i++) {
@@ -111,8 +116,7 @@ const initializeServer = async () => {
   // Apply authentication middleware to all socket connections
   io.use(socketService.authenticateSocket);
     // Make io instance available to routes
-  app.set('io', io);  
-  // Routes 
+  app.set('io', io);    // Routes 
   app.use('/api/auth', authRoutes);
   app.use('/api/admin', authenticate, adminRoutes);
   app.use('/api/chats', authenticate, chatRoutes);
@@ -121,6 +125,7 @@ const initializeServer = async () => {
   app.use('/api/users', authenticate, require('./src/routes/userRoutes'));
   app.use('/api/url-metadata', require('./src/routes/urlMetadataRoutes'));
   app.use('/api/knowledge', authenticate, knowledgeRoutes);
+  app.use('/api/languages', languageRoutes);
     // Socket.IO connections
   io.on('connection', (socket) => {
     socketService.handleSocket(socket);

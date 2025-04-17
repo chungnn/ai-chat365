@@ -49,14 +49,18 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import { useI18n } from 'vue-i18n';
 
-export default {
-  name: 'UrlPreview',
+export default {  name: 'UrlPreview',
   props: {
     url: {
       type: String,
       required: true
     }
+  },
+  setup() {
+    const { t } = useI18n();
+    return { t };
   },
   data() {
     return {
@@ -64,7 +68,7 @@ export default {
       error: false,
       videoType: null
     };
-  },  computed: {
+  },computed: {
     ...mapGetters({
       getMetadataByUrl: 'urlMetadata/getMetadataByUrl',
       isLoadingMetadata: 'urlMetadata/isLoading'
@@ -245,8 +249,7 @@ export default {
         return url;
       }
     },
-    
-    enhanceVideoMetadata() {
+      enhanceVideoMetadata() {
       // This method can be extended to fetch additional metadata for videos if needed
       // For example, you could make specific API calls to YouTube/Vimeo APIs
       // For now, we'll just make sure we use what we have effectively
@@ -257,7 +260,8 @@ export default {
                        this.videoType === 'vimeo' ? this.getVimeoVideoId(this.url) :
                        this.getDailymotionVideoId(this.url);
         
-        this.previewData.title = `${this.videoType.charAt(0).toUpperCase() + this.videoType.slice(1)} Video: ${videoId}`;
+        const videoTypeName = this.t(`urlPreview.${this.videoType}`);
+        this.previewData.title = `${videoTypeName} ${this.t('urlPreview.video')} ${videoId}`;
       }
     },
     

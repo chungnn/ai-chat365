@@ -1,22 +1,21 @@
 <template>  <aside class="sidebar">
     <div class="sidebar-header">
-      <h2>Trung Tâm Hỗ Trợ Management</h2>
+      <h2>{{ t('common.supportCenter') }}</h2>
     </div>
-    <nav class="sidebar-nav">
-      <router-link
+    <nav class="sidebar-nav">      <router-link
         to="/dashboard"
         class="nav-link"
         active-class="active"
       >
         <span class="icon">📊</span>
-        <span>Dashboard</span>
+        <span>{{ t('common.dashboard') }}</span>
       </router-link>      <router-link
         to="/chats"
         class="nav-link"
         active-class="active"
       >
         <span class="icon">💬</span>
-        <span>Chats</span>
+        <span>{{ t('common.chats') }}</span>
         <span
           v-if="unreadChats > 0"
           class="badge"
@@ -27,22 +26,21 @@
         active-class="active"
       >
         <span class="icon">🏷️</span>
-        <span>Tags</span>
-      </router-link>
-      <router-link
+        <span>{{ t('common.tags') }}</span>
+      </router-link>      <router-link
         to="/categories"
         class="nav-link"
         active-class="active"
       >
         <span class="icon">📂</span>
-        <span>Danh Mục</span>
+        <span>{{ t('common.categories') }}</span>
       </router-link>      <router-link
         to="/users"
         class="nav-link"
         active-class="active"
       >
         <span class="icon">👥</span>
-        <span>Người Dùng</span>
+        <span>{{ t('common.users') }}</span>
       </router-link>
       <router-link
         to="/knowledge"
@@ -50,15 +48,15 @@
         active-class="active"
       >
         <span class="icon">📚</span>
-        <span>Tri Thức</span>
-      </router-link>    </nav>
-    <div class="sidebar-footer">
-      <p>© 2025 Trung Tâm Hỗ Trợ</p>
+        <span>{{ t('common.knowledge') }}</span>
+      </router-link>    </nav>    <div class="sidebar-footer">
+      <p>{{ t('common.copyright') }}</p>
     </div>
   </aside>
 </template>
 
 <script>
+import { useI18n } from 'vue-i18n';
 // import { computed } from 'vue';
 // import { useStore } from 'vuex';
 
@@ -66,15 +64,17 @@ export default {
   name: 'SidebarComponent',
   
   setup() {
+    const { t } = useI18n();
     // //const store = useStore();
     
     // const unreadChats = computed(() => {
     //   //return store.getters['chat/allChats'].filter(chat => chat.unread).length;
     // });
     
-    // return {
-    //   unreadChats
-    // };
+    return {
+      t
+      // unreadChats
+    };
   }
 }
 </script>

@@ -10,6 +10,7 @@
         <button
           class="notification-close"
           @click="removeNotification(notification.id)"
+          :aria-label="t('notifications.close')"
         >
           &times;
         </button>
@@ -21,11 +22,13 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'NotificationComponent',
   setup() {
     const store = useStore();
+    const { t } = useI18n();
     
     const notifications = computed(() => store.getters['notification/notifications']);
     
@@ -35,7 +38,8 @@ export default {
     
     return {
       notifications,
-      removeNotification
+      removeNotification,
+      t
     };
   }
 };

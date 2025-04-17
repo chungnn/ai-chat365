@@ -1,22 +1,28 @@
 <template>
   <div class="not-found">
     <div class="not-found-content">
-      <h1>404</h1>
-      <h2>Page Not Found</h2>
-      <p>The page you are looking for does not exist or has been moved.</p>
+      <h1>{{ t('errors.notFoundCode') }}</h1>
+      <h2>{{ t('errors.notFound') }}</h2>
+      <p>{{ t('errors.notFoundMessage') }}</p>
       <router-link
         to="/"
         class="btn btn-primary"
       >
-        Back to Dashboard
+        {{ t('errors.goBack') }}
       </router-link>
     </div>
   </div>
 </template>
 
 <script>
+import { useI18n } from 'vue-i18n';
+
 export default {
-  name: 'NotFoundView'
+  name: 'NotFoundView',
+  setup() {
+    const { t } = useI18n();
+    return { t };
+  }
 }
 </script>
 

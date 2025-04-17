@@ -1,14 +1,15 @@
 <template>
   <header class="main-header">
     <div class="header-content">
-      <h1>Admin Dashboard</h1>
+      <h1>{{ $t('common.appName') }}</h1>
       <div class="user-menu">
+        <LanguageSwitcher />
         <span>{{ adminName }}</span>
         <button
           class="btn btn-sm"
           @click="logout"
         >
-          Logout
+          {{ $t('common.logout') }}
         </button>
       </div>
     </div>
@@ -19,9 +20,13 @@
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import LanguageSwitcher from '../common/LanguageSwitcher.vue';
 
 export default {
   name: 'HeaderComponent',
+  components: {
+    LanguageSwitcher
+  },
   
   setup() {
     const store = useStore();

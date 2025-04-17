@@ -1,14 +1,12 @@
-<template>
-  <div class="login-container">
+<template>  <div class="login-container">
     <div class="login-card">
-      <h1>Admin Login</h1>
+      <h1>{{ t('auth.adminLogin') }}</h1>
       <div
         v-if="error"
         class="alert alert-error"
       >
         {{ error }}
-      </div>
-      <form
+      </div>      <form
         class="login-form"
         @submit.prevent="handleLogin"
       >
@@ -16,36 +14,34 @@
           <label
             for="email"
             class="form-label"
-          >Email</label>
+          >{{ t('auth.email') }}</label>
           <input
             id="email"
             v-model="credentials.email"
             type="email"
             class="form-control"
             required
-            placeholder="Enter your email"
+            :placeholder="t('auth.enterEmail')"
           >
-        </div>
-        <div class="form-group">
+        </div>        <div class="form-group">
           <label
             for="password"
             class="form-label"
-          >Password</label>
+          >{{ t('auth.password') }}</label>
           <input
             id="password"
             v-model="credentials.password"
             type="password"
             class="form-control"
             required
-            placeholder="Enter your password"
+            :placeholder="t('auth.enterPassword')"
           >
-        </div>
-        <button
+        </div>        <button
           type="submit"
           class="btn btn-primary login-btn"
           :disabled="loading"
         >
-          {{ loading ? 'Loading...' : 'Login' }}
+          {{ loading ? t('common.loading') : t('common.login') }}
         </button>
       </form>
     </div>
@@ -56,12 +52,14 @@
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'LoginView',
   setup() {
     const store = useStore();
     const router = useRouter();
+    const { t } = useI18n();
     
     const credentials = ref({
       email: '',
@@ -86,12 +84,12 @@ export default {
         }
       }
     };
-    
-    return {
+      return {
       credentials,
       loading,
       error,
-      handleLogin
+      handleLogin,
+      t
     };
   }
 };
