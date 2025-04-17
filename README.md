@@ -111,3 +111,8 @@ Below are some screenshots of the AI Helpdesk Support System in action:
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Custom Solutions
+Need a tailored solution for your organization? Contact us for customization services:
+- Facebook: [fb.com/chungnn](https://fb.com/chungnn)
+- Telegram: [@TE_chungnn](https://t.me/TE_chungnn)
