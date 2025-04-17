@@ -111,7 +111,9 @@ const initializeServer = async () => {
   // Apply authentication middleware to all socket connections
   io.use(socketService.authenticateSocket);
     // Make io instance available to routes
-  app.set('io', io);  // Routes  app.use('/api/auth', authRoutes);
+  app.set('io', io);  
+  // Routes 
+  app.use('/api/auth', authRoutes);
   app.use('/api/admin', authenticate, adminRoutes);
   app.use('/api/chats', authenticate, chatRoutes);
   app.use('/api/tags', authenticate, tagRoutes);
