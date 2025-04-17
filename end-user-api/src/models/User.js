@@ -76,16 +76,22 @@ UserSchema.methods.comparePassword = async function(plainPassword) {
   return await bcrypt.compare(plainPassword, this.password);
 };
 
-// Method to generate auth token
+// Method to generate auth token using RS256 algorithm
 UserSchema.methods.generateAuthToken = function() {
+  if (!config.jwt || !config.jwt.privateKey) {
+    throw new Error('JWT private key not found. Cannot generate token.');
+  }
+  
   return jwt.sign(
     { 
       id: this._id,
-      role: this.role,
-      isAdmin: this.role === 'admin' 
+      role: this.role
     },
-    config.jwtSecret,
-    { expiresIn: config.jwtExpiration }
+    config.jwt.privateKey,
+    { 
+      algorithm: 'RS256',
+      expiresIn: config.jwtExpiration 
+    }
   );
 };
 

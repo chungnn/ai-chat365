@@ -411,13 +411,9 @@ export default {
         // Nếu AI đề xuất chuyển sang nhân viên tư vấn
         if (response && response.suggestHumanTransfer) {
           this.showTransferDialog = true;
-        }
-
-        // Nếu AI đề xuất lấy thông tin liên hệ và chưa có thông tin
-        if (!this.userInfo.phone && this.messages.length > 3 && !this.suggestContactInfo) {
-          this.suggestContactInfo = true;
-          this.showUserInfoDialog = true;
-        }        // Nếu đang chờ nhân viên tư vấn
+        }   
+        
+        // Nếu đang chờ nhân viên tư vấn
         if (response && response.waitingForAgent) {
           this.waitingForAgent = true;
           this.showSnackbar(this.$t('chat.messageSentToAgent'), 'info');

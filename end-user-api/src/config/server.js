@@ -48,7 +48,8 @@ const setupServer = (app) => {
  * Configure all routes for the application
  * @param {Object} app - Express app instance
  */
-const configureRoutes = (app) => {  // Routes  app.use('/api/auth', require('../routes/authRoutes'));
+const configureRoutes = (app) => {  // Routes  
+  app.use('/api/auth', require('../routes/authRoutes'));
   app.use('/api/chat', require('../routes/chatRoutes'));
   app.use('/api/url-metadata', require('../routes/urlMetadataRoutes'));
   app.use('/api/ticket', require('../routes/ticketRoutes'));

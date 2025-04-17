@@ -1,12 +1,31 @@
-const { elasticsearch } = require('../../../mgmt-api/src/config/config');
-
 require('dotenv').config();
+
+const fs = require('fs');
+const path = require('path');
+
+// Read RSA keys
+const privateKeyPath = path.join(__dirname, 'keys', 'private.key');
+const publicKeyPath = path.join(__dirname, 'keys', 'public.key');
+
+// Read keys or use defaults for development
+let privateKey, publicKey;
+try {
+  privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+  publicKey = fs.readFileSync(publicKeyPath, 'utf8');
+} catch (error) {
+  console.warn('Warning: RSA keys not found, using default JWT secret');
+}
 
 const config = {
   port: process.env.PORT || 5000,
   mongoURI: process.env.MONGO_URI || 'mongodb://localhost:27017/ai_chat365',
   jwtSecret: process.env.JWT_SECRET || 'your-secret-key',
   jwtExpiration: process.env.JWT_EXPIRATION || '7d',
+  jwt: {
+    privateKey: privateKey,
+    publicKey: publicKey,
+    algorithm: 'RS256',
+  },
   
   // Email configuration
   email: {
@@ -29,9 +48,9 @@ const config = {
   },
 
   elasticsearch: {
-    node: elasticsearch.node || 'http://localhost:9200',
-    username: elasticsearch.username || 'elastic',
-    password: elasticsearch.password || 'your-elastic-password',
+    node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200',
+    username: process.env.ELASTICSEARCH_USERNAME || 'elastic',
+    password: process.env.ELASTICSEARCH_PASSWORD || 'your-elastic-password',
   },
 };
 
