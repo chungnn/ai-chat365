@@ -36,7 +36,7 @@ module.exports = (req, res, next) => {
         message: 'Lỗi hệ thống xác thực'
       });
     }
-    console.log(config.jwt);
+    
     // Verify with RS256 and public key
     const decoded = jwt.verify(token, config.jwt.publicKey, { algorithms: ['RS256'] });
     

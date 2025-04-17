@@ -41,6 +41,8 @@ This project consists of four main components:
     ```powershell
     cd end-user-api
     npm install
+    # Generate RSA key pair for JWT authentication
+    node generate-keys.js
     # Configure your .env file based on the example
     npm run dev
     ```
