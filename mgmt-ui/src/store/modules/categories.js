@@ -1,16 +1,4 @@
-import axios from 'axios';
-
-// Base API URL
-const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:5000/api';
-
-// Category endpoints
-const CATEGORY_ENDPOINTS = {
-  GET_CATEGORIES: `${API_URL}/api/categories`,
-  GET_CATEGORY: (id) => `${API_URL}/api/categories/${id}`,
-  CREATE_CATEGORY: `${API_URL}/api/categories`,
-  UPDATE_CATEGORY: (id) => `${API_URL}/api/categories/${id}`,
-  DELETE_CATEGORY: (id) => `${API_URL}/api/categories/${id}`
-};
+import categoryApiClient, { CATEGORY_ENDPOINTS } from '../../config/categoryApi';
 
 const state = {
   categories: [],
@@ -59,8 +47,7 @@ const actions = {
   async fetchCategories({ commit }) {
     try {
       commit('SET_LOADING', true);
-      
-      const response = await axios.get(CATEGORY_ENDPOINTS.GET_CATEGORIES);
+        const response = await categoryApiClient.get(CATEGORY_ENDPOINTS.GET_CATEGORIES);
       
       if (response.data && Array.isArray(response.data.categories)) {
         commit('SET_CATEGORIES', response.data.categories);
@@ -85,8 +72,7 @@ const actions = {
   async fetchCategoryById({ commit }, categoryId) {
     try {
       commit('SET_LOADING', true);
-      
-      const response = await axios.get(CATEGORY_ENDPOINTS.GET_CATEGORY(categoryId));
+        const response = await categoryApiClient.get(CATEGORY_ENDPOINTS.GET_CATEGORY(categoryId));
       
       if (response.data) {
         commit('SET_CURRENT_CATEGORY', response.data);
@@ -107,8 +93,7 @@ const actions = {
   async createCategory({ commit }, categoryData) {
     try {
       commit('SET_LOADING', true);
-      
-      const response = await axios.post(CATEGORY_ENDPOINTS.CREATE_CATEGORY, categoryData);
+        const response = await categoryApiClient.post(CATEGORY_ENDPOINTS.CREATE_CATEGORY, categoryData);
       
       if (response.data && response.data.category) {
         commit('ADD_CATEGORY', response.data.category);
@@ -131,8 +116,7 @@ const actions = {
   async updateCategory({ commit }, { id, ...categoryData }) {
     try {
       commit('SET_LOADING', true);
-      
-      const response = await axios.put(CATEGORY_ENDPOINTS.UPDATE_CATEGORY(id), categoryData);
+        const response = await categoryApiClient.put(CATEGORY_ENDPOINTS.UPDATE_CATEGORY(id), categoryData);
       
       if (response.data && response.data.category) {
         commit('UPDATE_CATEGORY', response.data.category);
@@ -156,8 +140,7 @@ const actions = {
   async deleteCategory({ commit }, id) {
     try {
       commit('SET_LOADING', true);
-      
-      await axios.delete(CATEGORY_ENDPOINTS.DELETE_CATEGORY(id));
+        await categoryApiClient.delete(CATEGORY_ENDPOINTS.DELETE_CATEGORY(id));
       
       commit('REMOVE_CATEGORY', id);
       return true;

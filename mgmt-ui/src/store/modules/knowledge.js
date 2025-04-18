@@ -1,17 +1,4 @@
-// filepath: d:\ANH CHUNG\Projects\ai-chat365\mgmt-ui\src\store\modules\knowledge.js
-import axios from 'axios';
-
-// Base API URL
-const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:5000/api';
-
-// Knowledge endpoints
-const KNOWLEDGE_ENDPOINTS = {
-  GET_KNOWLEDGE: `${API_URL}/api/knowledge`,
-  SEARCH_KNOWLEDGE: (query) => `${API_URL}/api/knowledge/search?query=${encodeURIComponent(query)}`,
-  CREATE_KNOWLEDGE: `${API_URL}/api/knowledge`,
-  UPDATE_KNOWLEDGE: (id) => `${API_URL}/api/knowledge/${id}`,
-  DELETE_KNOWLEDGE: (id) => `${API_URL}/api/knowledge/${id}`
-};
+import knowledgeApiClient, { KNOWLEDGE_ENDPOINTS } from '../../config/knowledgeApi';
 
 const state = {
   knowledgeItems: [],
@@ -34,7 +21,7 @@ const actions = {
       commit('SET_LOADING', true);
       commit('SET_ERROR', null);
       
-      const response = await axios.get(KNOWLEDGE_ENDPOINTS.GET_KNOWLEDGE);
+      const response = await knowledgeApiClient.get(KNOWLEDGE_ENDPOINTS.GET_KNOWLEDGE);
       
       if (response.data && Array.isArray(response.data.knowledgeItems)) {
         commit('SET_KNOWLEDGE_ITEMS', response.data.knowledgeItems);
@@ -66,7 +53,7 @@ const actions = {
       commit('SET_LOADING', true);
       commit('SET_ERROR', null);
       
-      const response = await axios.get(KNOWLEDGE_ENDPOINTS.SEARCH_KNOWLEDGE(searchTerm));
+      const response = await knowledgeApiClient.get(KNOWLEDGE_ENDPOINTS.SEARCH_KNOWLEDGE(searchTerm));
       
       if (response.data && Array.isArray(response.data.knowledgeItems)) {
         commit('SET_KNOWLEDGE_ITEMS', response.data.knowledgeItems);
@@ -92,7 +79,7 @@ const actions = {
     try {
       commit('SET_LOADING', true);
       
-      const response = await axios.post(KNOWLEDGE_ENDPOINTS.CREATE_KNOWLEDGE, knowledge);
+      const response = await knowledgeApiClient.post(KNOWLEDGE_ENDPOINTS.CREATE_KNOWLEDGE, knowledge);
       
       if (response.data && response.data.success) {
         // Xử lý khi response trả về một mảng items
@@ -138,7 +125,7 @@ const actions = {
     try {
       commit('SET_LOADING', true);
       
-      const response = await axios.put(KNOWLEDGE_ENDPOINTS.UPDATE_KNOWLEDGE(knowledge.id), knowledge);
+      const response = await knowledgeApiClient.put(KNOWLEDGE_ENDPOINTS.UPDATE_KNOWLEDGE(knowledge.id), knowledge);
         if (response.data && response.data.knowledge) {
         commit('UPDATE_KNOWLEDGE_ITEM', response.data.knowledge);
         dispatch('notification/showNotification', {
@@ -165,7 +152,7 @@ const actions = {
     try {
       commit('SET_LOADING', true);
       
-      await axios.delete(KNOWLEDGE_ENDPOINTS.DELETE_KNOWLEDGE(id));
+      await knowledgeApiClient.delete(KNOWLEDGE_ENDPOINTS.DELETE_KNOWLEDGE(id));
         commit('REMOVE_KNOWLEDGE_ITEM', id);
       dispatch('notification/showNotification', {
         type: 'success',
