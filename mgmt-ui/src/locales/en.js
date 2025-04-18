@@ -38,7 +38,10 @@ export default {  common: {
     english: 'English',
     vietnamese: 'Vietnamese',
     languageChanged: 'Language changed successfully',
-    languageChangeFailed: 'Failed to change language'
+    languageChangeFailed: 'Failed to change language',
+    createdAt: 'Created At',
+    updatedAt: 'Updated At',
+    view: 'View',
   },  auth: {
     signIn: 'Sign In',
     signUp: 'Sign Up',
@@ -82,8 +85,7 @@ export default {  common: {
     anonymous: 'Anonymous',
     noMessages: 'No messages',
     failedToLoad: 'Failed to load dashboard data'
-  },
-  chat: {
+  },  chat: {
     conversation: 'Conversation',
     newMessage: 'New Message',
     sendMessage: 'Send Message',
@@ -100,6 +102,7 @@ export default {  common: {
     resolved: 'Resolved',
     pending: 'Pending',
     searchChats: 'Search chats',
+    searchByNameOrMessage: 'Search by name or message',
     filterByDate: 'Filter by date',
     filterByCategory: 'Filter by category',
     filterByStatus: 'Filter by status',
@@ -110,7 +113,13 @@ export default {  common: {
     categoryUpdated: 'Category updated successfully',
     priorityUpdated: 'Priority updated successfully',
     statusUpdated: 'Status updated successfully',
-    back: 'Back to Chats'
+    back: 'Back to Chats',
+    chatsManagement: 'Chats Management',
+    lastMessage: 'Last Message',
+    user: 'User',
+    agent: 'Agent',
+    ai: 'AI',
+    anonymous: 'Anonymous'
   },  users: {
     userManagement: 'User Management',
     userDetails: 'User Details',
@@ -260,5 +269,32 @@ export default {  common: {
     update: 'Update',
     cancel: 'Cancel',
     delete: 'Delete'
+  },
+  // Add chat detail translations
+  chatDetail: {
+    backToChats: 'Back to Chats',
+    chatWith: 'Chat with',
+    loading: 'Loading conversation...',
+    chatNotFound: 'Chat not found or has been deleted.',
+    noMessages: 'No messages in this conversation yet.',
+    typeReply: 'Type your reply...',
+    send: 'Send',
+    sending: 'Sending...',
+    chatTools: 'Chat Tools',
+    assignChat: 'Assign Chat',
+    selectAgent: 'Select Agent',
+    assigning: 'Assigning...',
+    classification: 'Classification',
+    selectCategory: 'Select Category',
+    savingCategory: 'Saving category...',
+    priority: 'Priority:',
+    low: 'Low',
+    medium: 'Medium',
+    high: 'High',
+    savingPriority: 'Saving priority...',
+    tags: 'Tags',
+    searchTags: 'Search tags...',
+    noMatchingTags: 'No matching tags',
+    manageTags: 'Manage Tags'
   }
 }

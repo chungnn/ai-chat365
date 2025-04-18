@@ -38,7 +38,10 @@ export default {  common: {
     english: 'Tiếng Anh',
     vietnamese: 'Tiếng Việt',
     languageChanged: 'Đổi ngôn ngữ thành công',
-    languageChangeFailed: 'Không thể đổi ngôn ngữ'
+    languageChangeFailed: 'Không thể đổi ngôn ngữ',
+    createdAt: "Thời gian tạo",
+    updatedAt: "Thời gian cập nhật",
+    view: 'Chi tiết',
   },  auth: {
     signIn: 'Đăng nhập',
     signUp: 'Đăng ký',
@@ -82,8 +85,7 @@ export default {  common: {
     anonymous: 'Vô danh',
     noMessages: 'Không có tin nhắn',
     failedToLoad: 'Không thể tải dữ liệu bảng điều khiển'
-  },
-  chat: {
+  },  chat: {
     conversation: 'Cuộc trò chuyện',
     newMessage: 'Tin nhắn mới',
     sendMessage: 'Gửi tin nhắn',
@@ -100,6 +102,7 @@ export default {  common: {
     resolved: 'Đã giải quyết',
     pending: 'Đang chờ',
     searchChats: 'Tìm kiếm cuộc trò chuyện',
+    searchByNameOrMessage: 'Tìm kiếm theo tên hoặc tin nhắn',
     filterByDate: 'Lọc theo ngày',
     filterByCategory: 'Lọc theo danh mục',
     filterByStatus: 'Lọc theo trạng thái',
@@ -110,7 +113,13 @@ export default {  common: {
     categoryUpdated: 'Đã cập nhật danh mục thành công',
     priorityUpdated: 'Đã cập nhật mức độ ưu tiên thành công',
     statusUpdated: 'Đã cập nhật trạng thái thành công',
-    back: 'Quay lại danh sách cuộc trò chuyện'
+    back: 'Quay lại danh sách cuộc trò chuyện',
+    chatsManagement: 'Quản lý cuộc trò chuyện',
+    lastMessage: 'Tin nhắn cuối',
+    user: 'Người dùng',
+    agent: 'Nhân viên',
+    ai: 'AI',
+    anonymous: 'Vô danh'
   },  users: {
     userManagement: 'Quản lý người dùng',
     userDetails: 'Thông tin người dùng',
@@ -260,5 +269,32 @@ export default {  common: {
     update: 'Cập Nhật',
     cancel: 'Hủy',
     delete: 'Xóa'
+  },
+  // Add chat detail translations
+  chatDetail: {
+    backToChats: 'Quay lại Các Cuộc Trò Chuyện',
+    chatWith: 'Trò chuyện với',
+    loading: 'Đang tải cuộc trò chuyện...',
+    chatNotFound: 'Không tìm thấy cuộc trò chuyện hoặc đã bị xóa.',
+    noMessages: 'Chưa có tin nhắn trong cuộc trò chuyện này.',
+    typeReply: 'Nhập trả lời của bạn...',
+    send: 'Gửi',
+    sending: 'Đang gửi...',
+    chatTools: 'Công cụ Trò chuyện',
+    assignChat: 'Gán Cuộc trò chuyện',
+    selectAgent: 'Chọn Nhân viên',
+    assigning: 'Đang gán...',
+    classification: 'Phân loại',
+    selectCategory: 'Chọn Danh mục',
+    savingCategory: 'Đang lưu danh mục...',
+    priority: 'Độ ưu tiên:',
+    low: 'Thấp',
+    medium: 'Trung bình',
+    high: 'Cao',
+    savingPriority: 'Đang lưu độ ưu tiên...',
+    tags: 'Thẻ',
+    searchTags: 'Tìm kiếm thẻ...',
+    noMatchingTags: 'Không có thẻ phù hợp',
+    manageTags: 'Quản lý Thẻ'
   }
 }

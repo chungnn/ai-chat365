@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { configureAxios } from '@/config/api';
+import router from '@/router';
 
 // Base API URL from environment variable
 export const API_BASE_URL = process.env.VUE_APP_API_URL || '';
@@ -53,7 +54,29 @@ const actions = {
         }
     },
 
-    logout({ commit }) {
+    // Force re-login when authentication fails
+    async forceRelogin({ commit, dispatch }) {
+      console.warn('Authentication failed. Forcing re-login...');
+      
+      // Show notification to user
+      dispatch('notification/showNotification', {
+        type: 'error',
+        message: 'Your session has expired. Please log in again.'
+      }, { root: true });
+      
+      // Clear authentication data
+      commit('CLEAR_AUTH_DATA');
+      
+      // Redirect to login page
+      if (router) {
+        router.push('/login');
+      } else {
+        // Fallback if router is not available
+        window.location.href = '/login';
+      }
+    },
+    
+    async logout({ commit }) {
         commit('CLEAR_AUTH_DATA');
         delete axios.defaults.headers.common['Authorization'];
     },

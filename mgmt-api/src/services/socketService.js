@@ -9,6 +9,11 @@ const authenticateSocket = async (socket, next) => {
     const token = socket.handshake.auth.token || socket.handshake.query.token;
     
     if (!token) {
+      socket.emit('auth_error', { 
+        code: 'NO_TOKEN',
+        message: 'Authentication error: No token provided',
+        requireRelogin: true
+      });
       return next(new Error('Authentication error: No token provided'));
     }
     
@@ -18,6 +23,11 @@ const authenticateSocket = async (socket, next) => {
     // Find user by id
     const user = await User.findById(decoded.id);
     if (!user || user.role !== 'admin') {
+      socket.emit('auth_error', { 
+        code: 'INVALID_USER',
+        message: 'Authentication error: Admin not found',
+        requireRelogin: true
+      });
       return next(new Error('Authentication error: Admin not found'));
     }
     
@@ -26,6 +36,11 @@ const authenticateSocket = async (socket, next) => {
     next();
   } catch (error) {
     console.error('Socket authentication error:', error);
+    socket.emit('auth_error', { 
+      code: 'INVALID_TOKEN',
+      message: 'Authentication error: Invalid token',
+      requireRelogin: true
+    });
     next(new Error('Authentication error: Invalid token'));
   }
 };
@@ -34,6 +49,11 @@ const handleSocket = (socket) => {
   // Check if the connection has been authenticated
   if (!socket.admin) {
     console.warn('Unauthenticated socket connection attempt');
+    socket.emit('auth_error', { 
+      code: 'UNAUTHENTICATED',
+      message: 'Authentication required',
+      requireRelogin: true
+    });
     socket.disconnect();
     return;
   }

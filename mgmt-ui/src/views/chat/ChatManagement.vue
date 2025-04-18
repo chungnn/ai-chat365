@@ -1,7 +1,6 @@
-<template>
-  <div class="chat-management">
+<template>  <div class="chat-management">
     <h2 class="page-title">
-      Chats Management
+      {{ t('chat.chatsManagement') }}
     </h2>
     
     <div class="filters">
@@ -9,7 +8,7 @@
         <input 
           v-model="searchQuery" 
           type="text" 
-          placeholder="Search by name or message..." 
+          :placeholder="t('chat.searchByNameOrMessage')" 
           class="form-control"
         >
       </div>
@@ -26,39 +25,37 @@
       </div>
     </div>
     
-    <div class="card">
-      <div
+    <div class="card">      <div
         v-if="loading"
         class="loading-container"
       >
-        <p>Loading chats...</p>
+        <p>{{ t('common.loading') }}</p>
       </div>
       
       <div
         v-else-if="filteredChats.length === 0"
         class="empty-state"
       >
-        <p>No chats found.</p>
+        <p>{{ t('chat.noChats') }}</p>
       </div>
       
       <table
         v-else
         class="table"
       >        <thead>          <tr>
-            <th>User</th>
-            <th>Latest Message</th>
-            <th>Tags</th>
-            <th>Created At</th>
-            <th>Updated At</th>
-            <th>Actions</th>
+            <th>{{ t('common.users') }}</th>
+            <th>{{ t('chat.lastMessage') }}</th>
+            <th>{{ t('common.tags') }}</th>
+            <th>{{ t('common.createdAt') }}</th>
+            <th>{{ t('common.updatedAt') }}</th>
+            <th>{{ t('common.actions') }}</th>
           </tr>
         </thead>
         <tbody>          <tr 
             v-for="chat in filteredChats" 
             :key="chat._id" 
             :class="{ unread: chat.unread }"
-          >
-            <td>{{ chat.user?.name || 'Anonymous' }}</td>
+          >            <td>{{ chat.user?.name || t('chat.anonymous') }}</td>
             <td class="message-preview">
               {{ getLastMessage(chat) }}
             </td>
@@ -73,7 +70,7 @@
                   {{ tag.name }}
                 </span>
               </div>
-              <span v-else class="no-tags">No tags</span>
+              <span v-else class="no-tags">{{ t('tags.noTags') }}</span>
             </td>
             <td>{{ formatDate(chat.createdAt) }}</td>
             <td>{{ formatDate(chat.updatedAt) }}</td>
@@ -81,8 +78,7 @@
               <router-link
                 :to="`/chats/${chat._id}`"
                 class="btn btn-sm btn-primary"
-              >
-                View
+              >                {{ t('common.view') }}
               </router-link>
             </td>
           </tr>
@@ -95,18 +91,19 @@
 <script>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'ChatManagementView',
   
   setup() {
     const store = useStore();
+    const { t } = useI18n();
     const loading = ref(true);
     const searchQuery = ref('');
-    const currentFilter = ref('all');
-      const statusFilters = [
-      { label: 'All', value: 'all' }
-    ];
+    const currentFilter = ref('all');    const statusFilters = computed(() => [
+      { label: t('common.all'), value: 'all' }
+    ]);
 
     const chats = computed(() => {
       const allChats = store.getters['chat/allChats'];
@@ -125,19 +122,18 @@ export default {
       }
 
       return result.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-    });
-      const getLastMessage = (chat) => {
+    });      const getLastMessage = (chat) => {
       if (!chat.lastMessage) {
-        return 'No messages yet';
+        return t('chat.noMessages');
       }
       
       const preview = chat.lastMessage.content.length > 40
         ? chat.lastMessage.content.substring(0, 40) + '...'
         : chat.lastMessage.content;
         
-      const sender = chat.lastMessage.role === 'agent' ? 'Agent: ' : 
-                    chat.lastMessage.role === 'user' ? 'User: ' : 
-                    chat.lastMessage.role === 'assistant' ? 'AI: ' : '';
+      const sender = chat.lastMessage.role === 'agent' ? t('chat.agent') + ': ' : 
+                    chat.lastMessage.role === 'user' ? t('chat.user') + ': ' : 
+                    chat.lastMessage.role === 'assistant' ? t('chat.ai') + ': ' : '';
       return sender + preview;
     };
     
@@ -163,8 +159,7 @@ export default {
         loading.value = false;
       }
     });
-    
-    return {
+      return {
       loading,
       searchQuery,
       statusFilters,
@@ -172,7 +167,8 @@ export default {
       filteredChats,
       getLastMessage,
       formatDate,
-      setStatusFilter
+      setStatusFilter,
+      t, // Add the translation function
     };
   }
 }

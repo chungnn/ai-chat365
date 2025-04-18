@@ -1,5 +1,6 @@
 import { createStore } from 'vuex';
 import VuexPersistence from 'vuex-persist';
+import { setStore } from '@/config/api';
 import auth from './modules/auth';
 import chat from './modules/chat';
 import notification from './modules/notification';
@@ -28,5 +29,8 @@ const store = createStore({  modules: {
   },
   plugins: [vuexLocal.plugin]
 });
+
+// Set store reference in API module to handle authentication errors
+setStore(store);
 
 export default store;

@@ -5,9 +5,9 @@
         to="/chats"
         class="back-button"
       >
-        &larr; Back to Chats
+        &larr; {{ t('chatDetail.backToChats') }}
       </router-link>      <h2 class="page-title">
-        Chat with {{ chatUser }} 
+        {{ t('chatDetail.chatWith') }} {{ chatUser }} 
         <span v-if="currentChat && currentChat.ticketId" class="ticket-badge">
           <span class="ticket-id">{{ currentChat.ticketId }}</span>
         </span>
@@ -21,14 +21,14 @@
           v-if="loading"
           class="loading-overlay"
         >
-          <p>Loading conversation...</p>
+          <p>{{ t('chatDetail.loading') }}</p>
         </div>
 
         <div
           v-else-if="!currentChat"
           class="empty-state"
         >
-          <p>Chat not found or has been deleted.</p>
+          <p>{{ t('chatDetail.chatNotFound') }}</p>
         </div>
 
         <div
@@ -43,7 +43,7 @@
               v-if="currentChat.messages && currentChat.messages.length === 0"
               class="empty-chat"
             >
-              <p>No messages in this conversation yet.</p>
+              <p>{{ t('chatDetail.noMessages') }}</p>
             </div>
             <div v-else>
               <div 
@@ -73,7 +73,7 @@
           <div class="reply-form">
             <textarea 
               v-model="replyMessage" 
-              placeholder="Type your reply..." 
+              :placeholder="t('chatDetail.typeReply')" 
               class="reply-input"
               @keydown.enter.exact.prevent="sendReply"
             />
@@ -82,7 +82,7 @@
               :disabled="!replyMessage.trim() || sending" 
               @click="sendReply"
             >
-              {{ sending ? 'Sending...' : 'Send' }}
+              {{ sending ? t('chatDetail.sending') : t('chatDetail.send') }}
             </button>
           </div>
         </div>
@@ -91,17 +91,17 @@
       <!-- Right column: Admin tools -->
       <div class="admin-tools">
         <div class="tools-section">
-          <h3 class="tools-title">Chat Tools</h3>
+          <h3 class="tools-title">{{ t('chatDetail.chatTools') }}</h3>
             <!-- Assignment section (updated) -->
           <div class="tool-card">
-            <h4 class="tool-header">Assign Chat</h4>            <div class="tool-content">
+            <h4 class="tool-header">{{ t('chatDetail.assignChat') }}</h4>            <div class="tool-content">
               <select 
                 v-model="selectedAgentId" 
                 class="form-control"
                 :disabled="assigningChat"
                 @change="autoAssignToAgent()"
               >
-                <option value="">Select Agent</option>
+                <option value="">{{ t('chatDetail.selectAgent') }}</option>
                 <option 
                   v-for="user in adminAgents" 
                   :key="user._id" 
@@ -111,14 +111,14 @@
                 </option>
               </select>
               <div v-if="assigningChat" class="mt-2 text-center">
-                <span class="status-text">Assigning...</span>
+                <span class="status-text">{{ t('chatDetail.assigning') }}</span>
               </div>
             </div>
           </div>
 
           <!-- Classification section (updated to use dynamic categories) -->
           <div class="tool-card">
-            <h4 class="tool-header">Classification</h4>
+            <h4 class="tool-header">{{ t('chatDetail.classification') }}</h4>
             <div class="tool-content">
               <select 
                 v-model="selectedCategoryId" 
@@ -126,7 +126,7 @@
                 :disabled="savingCategory"
                 @change="saveCategory()"
               >
-                <option value="">Select Category</option>
+                <option value="">{{ t('chatDetail.selectCategory') }}</option>
                 <option 
                   v-for="category in allCategories" 
                   :key="category._id" 
@@ -136,9 +136,9 @@
                 </option>
               </select>
               <div v-if="savingCategory" class="mt-2 text-center">
-                <span class="status-text">Saving category...</span>
+                <span class="status-text">{{ t('chatDetail.savingCategory') }}</span>
               </div>              <div class="priority-selector mt-2">
-                <span>Priority:</span>
+                <span>{{ t('chatDetail.priority') }}</span>
                 <div class="priority-options">
                   <button 
                     class="priority-btn low" 
@@ -146,7 +146,7 @@
                     @click="updatePriority('low')"
                     :disabled="savingPriority"
                   >
-                    Low
+                    {{ t('chatDetail.low') }}
                   </button>
                   <button 
                     class="priority-btn medium" 
@@ -154,7 +154,7 @@
                     @click="updatePriority('medium')"
                     :disabled="savingPriority"
                   >
-                    Medium
+                    {{ t('chatDetail.medium') }}
                   </button>
                   <button 
                     class="priority-btn high" 
@@ -162,19 +162,19 @@
                     @click="updatePriority('high')"
                     :disabled="savingPriority"
                   >
-                    High
+                    {{ t('chatDetail.high') }}
                   </button>
                 </div>
                 <div v-if="savingPriority" class="mt-2 text-center">
-                  <span class="status-text">Saving priority...</span>
+                  <span class="status-text">{{ t('chatDetail.savingPriority') }}</span>
                 </div>
               </div>
             </div>
           </div>
           
-          <!-- Tags section (unchanged) -->
+          <!-- Tags section (updated with translations) -->
           <div class="tool-card">
-            <h4 class="tool-header">Tags</h4>
+            <h4 class="tool-header">{{ t('chatDetail.tags') }}</h4>
             <div class="tool-content">
               <div v-if="selectedTags.length" class="selected-tags">
                 <span 
@@ -191,7 +191,7 @@
                 <input 
                   type="text" 
                   v-model="tagSearchQuery" 
-                  placeholder="Search tags..." 
+                  :placeholder="t('chatDetail.searchTags')" 
                   class="tag-search" 
                   @focus="showTagDropdown = true"
                 />
@@ -206,10 +206,10 @@
                     {{ tag.name }}
                   </div>
                   <div v-if="filteredTags.length === 0" class="tag-option no-results">
-                    No matching tags
+                    {{ t('chatDetail.noMatchingTags') }}
                   </div>
                   <div class="tag-option tag-manage" @click="goToTagManagement">
-                    <i class="fas fa-cog"></i> Manage Tags
+                    <i class="fas fa-cog"></i> {{ t('chatDetail.manageTags') }}
                   </div>
                 </div>
               </div>
@@ -225,6 +225,7 @@
 import { ref, computed, onMounted, onUpdated, onUnmounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import UrlPreview from '@/components/common/UrlPreview.vue';
 import { parseMarkdown } from '@/utils/markdown';
 
@@ -237,6 +238,7 @@ export default {
     const store = useStore();
     const route = useRoute();
     const router = useRouter();
+    const { t } = useI18n(); // Add i18n support
     
     const loading = ref(true);
     const sending = ref(false);
@@ -776,7 +778,9 @@ export default {
       // Priority
       selectedPriority,
       savingPriority,
-      updatePriority
+      updatePriority,
+      // Add the t function for i18n
+      t
     };
   }
 };

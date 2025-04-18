@@ -1,16 +1,5 @@
-import axios from 'axios';
 import io from 'socket.io-client';
-
-// Base API URL
-const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:5000/api';
-
-const CHAT_ENDPOINTS = {
-  GET_CHATS: `${API_URL}/api/chats`,
-  GET_CHAT_DETAIL: (chatId) => `${API_URL}/api/chats/${chatId}`,
-  ASSIGN_CHAT: (chatId) => `${API_URL}/api/chats/${chatId}/assign`,
-  GET_AGENTS: `${API_URL}/api/users?role=agent`,
-  // Add other chat-related endpoints as needed
-};
+import chatApiClient, { CHAT_ENDPOINTS, configureChatApi } from '@/config/chatApi';
 
 const state = {
   socket: null,
@@ -37,6 +26,9 @@ const actions = {
     const token = rootState.auth.token;
 
     if (!token) return;
+
+    // Configure chat API client with the token
+    configureChatApi(token);
 
     // Connect to socket server with auth token using centralized API URL config
     // Đảm bảo dùng cùng URL với end-user
@@ -65,6 +57,15 @@ const actions = {
       console.log('Joined agent-dashboard room for real-time user messages');
     });    socket.on('disconnect', () => {
       console.log('Socket disconnected');
+    });
+    
+    // Handle authentication errors
+    socket.on('auth_error', (error) => {
+      console.error('Socket authentication error:', error);
+      if (error.requireRelogin) {
+        // Force user to re-login
+        dispatch('auth/forceRelogin', null, { root: true });
+      }
     });
     
     // Handle new user messages coming from the new_user_message event
@@ -209,13 +210,18 @@ const actions = {
       commit('SET_LOADING', false);
     });
   },
-
   // Fetch active agents/users
-  async fetchAgents({ commit }) {
+  async fetchAgents({ commit, rootState }) {
     try {
       commit('SET_LOADING', true);
+      
+      // Ensure API client is configured
+      if (rootState.auth.token) {
+        configureChatApi(rootState.auth.token);
+      }
+      
       // Only get active users (isActive=true)
-      const response = await axios.get(`${API_URL}/api/users?isActive=true`);
+      const response = await chatApiClient.get(`/api/users?isActive=true`);
       
       if (response.data && response.data.users) {
         commit('SET_AGENTS', response.data.users);
@@ -231,11 +237,15 @@ const actions = {
       commit('SET_LOADING', false);
     }
   },
-
   // Assign chat to an agent
-  async assignChat({ commit }, { chatId, agentId }) {
+  async assignChat({ commit, rootState }, { chatId, agentId }) {
     try {
-      const response = await axios.post(CHAT_ENDPOINTS.ASSIGN_CHAT(chatId), { 
+      // Ensure API client is configured
+      if (rootState.auth.token) {
+        configureChatApi(rootState.auth.token);
+      }
+      
+      const response = await chatApiClient.post(CHAT_ENDPOINTS.ASSIGN_CHAT(chatId), { 
         agentId 
       });
       
@@ -267,13 +277,12 @@ const actions = {
       console.log('Fetching chats from:', CHAT_ENDPOINTS.GET_CHATS);
       console.log('Auth token available:', !!rootState.auth.token);
 
-      // Ensure authorization header is set
-      const token = rootState.auth.token;
-      if (token) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Make sure chat API is configured
+      if (rootState.auth.token) {
+        configureChatApi(rootState.auth.token);
       }
-
-      const response = await axios.get(CHAT_ENDPOINTS.GET_CHATS);
+      
+      const response = await chatApiClient.get(CHAT_ENDPOINTS.GET_CHATS);
       console.log('API Response:', response);
 
       // For debugging
@@ -328,15 +337,19 @@ const actions = {
     } finally {
       commit('SET_LOADING', false);
     }
-  },
-  // Fetch a specific chat by ID
-  async fetchChatById({ commit }, chatId) {
+  },  // Fetch a specific chat by ID
+  async fetchChatById({ commit, rootState }, chatId) {
     try {
       commit('SET_LOADING', true);
       console.log('Fetching chat details for ID:', chatId);
       console.log('Chat endpoint URL:', CHAT_ENDPOINTS.GET_CHAT_DETAIL(chatId));
 
-      const response = await axios.get(CHAT_ENDPOINTS.GET_CHAT_DETAIL(chatId));
+      // Ensure the API client is configured
+      if (rootState.auth.token) {
+        configureChatApi(rootState.auth.token);
+      }
+
+      const response = await chatApiClient.get(CHAT_ENDPOINTS.GET_CHAT_DETAIL(chatId));
       console.log('Chat API response:', response);
 
       if (response.data) {
@@ -371,9 +384,8 @@ const actions = {
     } finally {
       commit('SET_LOADING', false);
     }
-  },
-  // Send a reply to a chat using socket connection
-  async sendReply({ commit, state }, { chatId, content, sessionId }) {
+  },  // Send a reply to a chat using socket connection
+  async sendReply({ commit, state, rootState }, { chatId, content, sessionId }) {
     try {
       commit('SET_LOADING', true);
 
@@ -401,7 +413,13 @@ const actions = {
       // Fallback to HTTP if socket fails
       try {
         console.log('Falling back to HTTP request for reply');
-        const response = await axios.post(`${CHAT_ENDPOINTS.GET_CHAT_DETAIL(chatId)}/reply`, {
+        
+        // Ensure API client is configured
+        if (rootState.auth.token) {
+          configureChatApi(rootState.auth.token);
+        }
+        
+        const response = await chatApiClient.post(CHAT_ENDPOINTS.SEND_REPLY(chatId), {
           content
         });
 
@@ -422,13 +440,17 @@ const actions = {
   clearCurrentChat({ commit }) {
     commit('SET_CURRENT_CHAT', null);
   },
-  
-  // Update chat tags
-  async updateChatTags({ commit, state }, { chatId, tags }) {
+    // Update chat tags
+  async updateChatTags({ commit, state, rootState }, { chatId, tags }) {
     try {
       commit('SET_LOADING', true);
       
-      const response = await axios.put(`${CHAT_ENDPOINTS.GET_CHAT_DETAIL(chatId)}/tags`, { tags });
+      // Ensure API client is configured
+      if (rootState.auth.token) {
+        configureChatApi(rootState.auth.token);
+      }
+      
+      const response = await chatApiClient.put(CHAT_ENDPOINTS.UPDATE_TAGS(chatId), { tags });
       
       // Update the chat in state
       if (state.currentChat && state.currentChat._id === chatId) {
@@ -444,13 +466,17 @@ const actions = {
       commit('SET_LOADING', false);
     }
   },
-  
-  // Update chat category
-  async updateChatCategory({ commit, state }, { chatId, categoryId }) {
+    // Update chat category
+  async updateChatCategory({ commit, state, rootState }, { chatId, categoryId }) {
     try {
       commit('SET_LOADING', true);
       
-      const response = await axios.put(`${CHAT_ENDPOINTS.GET_CHAT_DETAIL(chatId)}/category`, { categoryId });
+      // Ensure API client is configured
+      if (rootState.auth.token) {
+        configureChatApi(rootState.auth.token);
+      }
+      
+      const response = await chatApiClient.put(CHAT_ENDPOINTS.UPDATE_CATEGORY(chatId), { categoryId });
       
       // Update the chat in state
       if (state.currentChat && state.currentChat._id === chatId) {
@@ -466,9 +492,8 @@ const actions = {
       commit('SET_LOADING', false);
     }
   },
-  
-  // Legacy support for status update - will be deprecated
-  async updateChatStatus({ commit, state }, { chatId, status, isTransferredToAgent }) {
+    // Legacy support for status update - will be deprecated
+  async updateChatStatus({ commit, state, rootState }, { chatId, status, isTransferredToAgent }) {
     try {
       commit('SET_LOADING', true);
       
@@ -479,7 +504,12 @@ const actions = {
         updateData.isTransferredToAgent = isTransferredToAgent;
       }
       
-      const response = await axios.put(`${CHAT_ENDPOINTS.GET_CHAT_DETAIL(chatId)}/status`, updateData);
+      // Ensure API client is configured
+      if (rootState.auth.token) {
+        configureChatApi(rootState.auth.token);
+      }
+      
+      const response = await chatApiClient.put(CHAT_ENDPOINTS.UPDATE_STATUS(chatId), updateData);
       
       // Update the chat in state
       if (state.currentChat && state.currentChat._id === chatId) {
@@ -499,13 +529,17 @@ const actions = {
     } finally {
       commit('SET_LOADING', false);
     }
-  },
-  // Update chat priority
-  async updateChatPriority({ commit, state }, { chatId, priority }) {
+  },  // Update chat priority
+  async updateChatPriority({ commit, state, rootState }, { chatId, priority }) {
     try {
       commit('SET_LOADING', true);
       
-      const response = await axios.put(`${CHAT_ENDPOINTS.GET_CHAT_DETAIL(chatId)}/priority`, { priority });
+      // Ensure API client is configured
+      if (rootState.auth.token) {
+        configureChatApi(rootState.auth.token);
+      }
+      
+      const response = await chatApiClient.put(CHAT_ENDPOINTS.UPDATE_PRIORITY(chatId), { priority });
       
       // Update the chat in state
       if (state.currentChat && state.currentChat._id === chatId) {
