@@ -55,7 +55,7 @@
             v-for="chat in filteredChats" 
             :key="chat._id" 
             :class="{ unread: chat.unread }"
-          >            <td>{{ chat.user?.name || t('chat.anonymous') }}</td>
+          >            <td>{{ chat.userInfo?.name || t('chat.anonymous') }}</td>
             <td class="message-preview">
               {{ getLastMessage(chat) }}
             </td>

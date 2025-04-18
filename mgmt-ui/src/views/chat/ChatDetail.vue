@@ -284,10 +284,10 @@ export default {
     });
     
     const chatUser = computed(() => {
-      if (!currentChat.value || !currentChat.value.user) {
+      if (!currentChat.value || !currentChat.value.userInfo) {
         return 'Anonymous';
       }
-      return currentChat.value.user.name || 'Anonymous';
+      return currentChat.value.userInfo.name || 'Anonymous';
     });
     
     // Get session ID which is always used as the primary room ID

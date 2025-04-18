@@ -302,14 +302,27 @@ export default {
       this.$nextTick(() => {
         this.scrollToBottom();
       });
-    },
-    user: {
+    },    user: {
       immediate: true,
       handler(user) {
         if (user) {
           this.userInfo.name = user.firstName + ' ' + user.lastName;
           this.userInfo.email = user.email;
           this.userInfo.phone = user.phoneNumber || '';
+          this.userInfo.userId = user.id; // Thêm ID người dùng vào thông tin cập nhật
+          
+          // Nếu có session ID và thông tin người dùng đầy đủ, tự động cập nhật thông tin vào chat
+          if (this.sessionId && this.userInfo.name && this.userInfo.email) {
+            console.log('[CHAT DEBUG] Tự động cập nhật thông tin người dùng sau khi đăng nhập');
+            console.log('[CHAT DEBUG] User ID: ', user.id);
+            this.$store.dispatch('chat/updateUserInfo', this.userInfo)
+              .then(() => {
+                console.log('[CHAT DEBUG] Cập nhật thông tin người dùng thành công');
+              })
+              .catch((error) => {
+                console.error('[CHAT DEBUG] Lỗi khi cập nhật thông tin người dùng:', error);
+              });
+          }
         }
       }
     },
@@ -492,8 +505,7 @@ export default {
         color,
         timeout
       };
-    },
-    async initChat() {
+    },    async initChat() {
       this.isInitialLoading = true;
       try {
         // Ensure socket connection is established
@@ -507,7 +519,25 @@ export default {
         // Join the chat room for real-time updates
         if (this.sessionId && this.socket.joinChatRoom) {
           this.socket.joinChatRoom(this.sessionId);
-        }      } catch (error) {
+        }
+        
+        // Nếu người dùng đã đăng nhập, cập nhật thông tin vào userInfo và cập nhật lên server
+        if (this.user && this.sessionId) {
+          console.log('[CHAT DEBUG] Người dùng đã đăng nhập khi khởi tạo chat');
+          this.userInfo.name = this.user.firstName + ' ' + this.user.lastName;
+          this.userInfo.email = this.user.email;
+          this.userInfo.phone = this.user.phoneNumber || '';
+          this.userInfo.userId = this.user.id;
+          
+          // Cập nhật thông tin người dùng vào phiên chat
+          try {
+            await this.$store.dispatch('chat/updateUserInfo', this.userInfo);
+            console.log('[CHAT DEBUG] Đã cập nhật thông tin người dùng trong initChat');
+          } catch (updateError) {
+            console.error('[CHAT DEBUG] Lỗi cập nhật thông tin người dùng trong initChat:', updateError);
+          }
+        }
+      } catch (error) {
         console.error('Lỗi khởi tạo chat:', error);
         this.showSnackbar(this.$t('chat.errorInitializingChat'), 'error');
       } finally {

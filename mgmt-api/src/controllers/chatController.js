@@ -20,7 +20,7 @@ exports.getAllChats = async (req, res) => {
     // Find chats with pagination, populate tags, and project only necessary fields
     const chats = await Chat.aggregate([
       { $match: query },
-      { $sort: { lastAgentResponse: 1, createdAt: -1 } },
+      { $sort: { createdAt: -1, lastAgentResponse: 1 } },
       { $skip: skip },
       { $limit: parseInt(limit) },
       // Get only the last message for each chat

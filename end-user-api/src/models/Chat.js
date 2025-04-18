@@ -57,6 +57,11 @@ const chatSchema = new mongoose.Schema({
     default: null
   },
   userInfo: {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    },
     name: {
       type: String,
       default: ''

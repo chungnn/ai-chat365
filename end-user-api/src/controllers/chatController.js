@@ -400,7 +400,7 @@ exports.sendMessage = async (req, res) => {
 exports.updateUserInfo = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const { name, email, phone } = req.body;
+    const { name, email, phone, userId } = req.body;
     
     const chat = await Chat.findOne({ sessionId });
     
@@ -418,8 +418,15 @@ exports.updateUserInfo = async (req, res) => {
     chat.userInfo = {
       name: name || chat.userInfo.name,
       email: email || chat.userInfo.email,
-      phone: phone || chat.userInfo.phone
+      phone: phone || chat.userInfo.phone,
+      userId: userId || chat.userInfo.userId
     };
+    
+    // Nếu có userId, cũng cập nhật trường userId chính của chat
+    if (userId) {
+      chat.userId = userId;
+      console.log(`[CHAT DEBUG] Updated chat.userId to: ${userId}`);
+    }
     
     await chat.save();
     
