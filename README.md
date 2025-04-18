@@ -99,7 +99,6 @@ The AI Helpdesk Support System features a sophisticated knowledge management sys
 - User-friendly interface for knowledge base management
 - Automated content categorization
 - Performance analytics on knowledge base usage
-- Relevance feedback system for continuous improvement
 
 ## Recent Updates
 - **Enhanced Security**: Implemented RS256 JWT authentication using RSA key pairs for more secure token generation and validation
@@ -123,3 +122,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Need a tailored solution for your organization? Contact us for customization services:
 - Facebook: [fb.com/chungnn](https://fb.com/chungnn)
 - Telegram: [@TE_chungnn](https://t.me/TE_chungnn)
+- LinkedIn: [Chung Nguyễn](https://www.linkedin.com/in/chungnn-8b074b44/)

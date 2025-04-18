@@ -55,4 +55,3 @@ debug.log
 *.cert
 */src/config/keys/*.js
 */src/config/keys/*
-**/config/keys/
