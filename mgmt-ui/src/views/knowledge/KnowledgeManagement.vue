@@ -5,13 +5,11 @@
       <button @click="openAddModal" class="btn btn-primary">
         <span class="icon">➕</span> {{ $t('knowledge.addNew') }}
       </button>
-    </div>
-
-    <div class="search-area">
+    </div>    <div class="search-area">
       <input 
         type="text" 
         v-model="searchTerm" 
-        placeholder="{{ $t('knowledge.search') }}" 
+        :placeholder="$t('knowledge.search')" 
         class="search-input"
         @input="handleSearch"
       />

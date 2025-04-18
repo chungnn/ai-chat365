@@ -30,7 +30,7 @@ const actions = {
       
       ensureConfigured(rootState);
 
-      const response = await knowledgeApiClient.get(KNOWLEDGE_ENDPOINTS.GET_KNOWLEDGE);
+      const response = await knowledgeApiClient.get(KNOWLEDGE_ENDPOINTS.GET_KNOWLEDGE_BASE);
       
       if (response.data && Array.isArray(response.data.knowledgeItems)) {
         commit('SET_KNOWLEDGE_ITEMS', response.data.knowledgeItems);

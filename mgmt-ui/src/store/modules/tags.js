@@ -1,14 +1,10 @@
-import axios from 'axios';
+import tagApiClient, { TAG_ENDPOINTS, configureTagApi } from '@/config/tagApi';
 
-// Base API URL
-const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:5000/api';
-
-// Tag endpoints
-const TAG_ENDPOINTS = {
-  GET_TAGS: `${API_URL}/api/tags`,
-  CREATE_TAG: `${API_URL}/api/tags`,
-  UPDATE_TAG: (id) => `${API_URL}/api/tags/${id}`,
-  DELETE_TAG: (id) => `${API_URL}/api/tags/${id}`
+// Helper function to ensure API client is configured before every request
+const ensureConfigured = (rootState) => {
+  if (rootState.auth && rootState.auth.token) {
+    configureTagApi(rootState.auth.token);
+  }
 };
 
 const state = {
@@ -24,11 +20,14 @@ const getters = {
 
 const actions = {
   // Fetch all tags
-  async fetchTags({ commit }) {
+  async fetchTags({ commit, rootState }) {
     try {
       commit('SET_LOADING', true);
       
-      const response = await axios.get(TAG_ENDPOINTS.GET_TAGS);
+      // Ensure API client is configured
+      ensureConfigured(rootState);
+      
+      const response = await tagApiClient.get(TAG_ENDPOINTS.GET_TAGS);
       
       if (response.data && Array.isArray(response.data.tags)) {
         commit('SET_TAGS', response.data.tags);
@@ -51,11 +50,14 @@ const actions = {
   },
   
   // Create a new tag
-  async createTag({ commit }, { name, color }) {
+  async createTag({ commit, rootState }, { name, color }) {
     try {
       commit('SET_LOADING', true);
       
-      const response = await axios.post(TAG_ENDPOINTS.CREATE_TAG, { name, color });
+      // Ensure API client is configured
+      ensureConfigured(rootState);
+      
+      const response = await tagApiClient.post(TAG_ENDPOINTS.CREATE_TAG, { name, color });
       
       if (response.data && response.data.tag) {
         commit('ADD_TAG', response.data.tag);
@@ -73,11 +75,14 @@ const actions = {
   },
   
   // Update an existing tag
-  async updateTag({ commit }, { id, name, color }) {
+  async updateTag({ commit, rootState }, { id, name, color }) {
     try {
       commit('SET_LOADING', true);
       
-      const response = await axios.put(TAG_ENDPOINTS.UPDATE_TAG(id), { name, color });
+      // Ensure API client is configured
+      ensureConfigured(rootState);
+      
+      const response = await tagApiClient.put(TAG_ENDPOINTS.UPDATE_TAG(id), { name, color });
       
       if (response.data && response.data.tag) {
         commit('UPDATE_TAG', response.data.tag);
@@ -95,11 +100,14 @@ const actions = {
   },
   
   // Delete a tag
-  async deleteTag({ commit }, id) {
+  async deleteTag({ commit, rootState }, id) {
     try {
       commit('SET_LOADING', true);
       
-      await axios.delete(TAG_ENDPOINTS.DELETE_TAG(id));
+      // Ensure API client is configured
+      ensureConfigured(rootState);
+      
+      await tagApiClient.delete(TAG_ENDPOINTS.DELETE_TAG(id));
       
       commit('REMOVE_TAG', id);
       return true;

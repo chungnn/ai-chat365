@@ -1,11 +1,10 @@
-import axios from 'axios';
+import urlMetaApiClient, { URL_META_ENDPOINTS, configureUrlMetaApi } from '@/config/urlMetaApi';
 
-// Base API URL
-const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:5000/api';
-
-// URL Metadata endpoints
-const URL_METADATA_ENDPOINTS = {
-  GET_METADATA: `${API_URL}/api/url-metadata`,
+// Helper function to ensure API client is configured before every request
+const ensureConfigured = (rootState) => {
+  if (rootState.auth && rootState.auth.token) {
+    configureUrlMetaApi(rootState.auth.token);
+  }
 };
 
 const state = {
@@ -21,8 +20,7 @@ const getters = {
   isLoading: (state) => state.loading
 };
 
-const actions = {
-  async fetchUrlMetadata({ commit, state }, url) {
+const actions = {  async fetchUrlMetadata({ commit, state, rootState }, url) {
     // Return cached metadata if available
     if (state.metadata[url]) {
       return state.metadata[url];
@@ -31,7 +29,10 @@ const actions = {
     commit('SET_LOADING', true);
     
     try {
-      const response = await axios.get(URL_METADATA_ENDPOINTS.GET_METADATA, {
+      // Đảm bảo API client được cấu hình với token xác thực trước khi gọi API
+      ensureConfigured(rootState);
+      
+      const response = await urlMetaApiClient.get(URL_META_ENDPOINTS.GET_METADATA, {
         params: { url }
       });
       
