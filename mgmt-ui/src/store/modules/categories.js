@@ -1,4 +1,11 @@
-import categoryApiClient, { CATEGORY_ENDPOINTS } from '../../config/categoryApi';
+import categoryApiClient, { CATEGORY_ENDPOINTS, configureCategoryApi } from '../../config/categoryApi';
+
+// Helper function to ensure API client is configured before every request
+const ensureConfigured = (rootState) => {
+  if (rootState.auth && rootState.auth.token) {
+    configureCategoryApi(rootState.auth.token);
+  }
+};
 
 const state = {
   categories: [],
@@ -44,10 +51,14 @@ const mutations = {
 
 const actions = {
   // Fetch all categories
-  async fetchCategories({ commit }) {
+  async fetchCategories({ commit, rootState }) {
     try {
       commit('SET_LOADING', true);
-        const response = await categoryApiClient.get(CATEGORY_ENDPOINTS.GET_CATEGORIES);
+      
+      // Đảm bảo API client được cấu hình đúng
+      ensureConfigured(rootState);
+        
+      const response = await categoryApiClient.get(CATEGORY_ENDPOINTS.GET_CATEGORIES);
       
       if (response.data && Array.isArray(response.data.categories)) {
         commit('SET_CATEGORIES', response.data.categories);
@@ -69,10 +80,14 @@ const actions = {
     }
   },  
   // Fetch category by ID
-  async fetchCategoryById({ commit }, categoryId) {
+  async fetchCategoryById({ commit, rootState }, categoryId) {
     try {
       commit('SET_LOADING', true);
-        const response = await categoryApiClient.get(CATEGORY_ENDPOINTS.GET_CATEGORY(categoryId));
+      
+      // Đảm bảo API client được cấu hình đúng
+      ensureConfigured(rootState);
+        
+      const response = await categoryApiClient.get(CATEGORY_ENDPOINTS.GET_CATEGORY(categoryId));
       
       if (response.data) {
         commit('SET_CURRENT_CATEGORY', response.data);
@@ -90,10 +105,14 @@ const actions = {
   },
   
   // Create a new category
-  async createCategory({ commit }, categoryData) {
+  async createCategory({ commit, rootState }, categoryData) {
     try {
       commit('SET_LOADING', true);
-        const response = await categoryApiClient.post(CATEGORY_ENDPOINTS.CREATE_CATEGORY, categoryData);
+      
+      // Đảm bảo API client được cấu hình đúng
+      ensureConfigured(rootState);
+        
+      const response = await categoryApiClient.post(CATEGORY_ENDPOINTS.CREATE_CATEGORY, categoryData);
       
       if (response.data && response.data.category) {
         commit('ADD_CATEGORY', response.data.category);
@@ -113,10 +132,14 @@ const actions = {
     }
   },  
   // Update an existing category
-  async updateCategory({ commit }, { id, ...categoryData }) {
+  async updateCategory({ commit, rootState }, { id, ...categoryData }) {
     try {
       commit('SET_LOADING', true);
-        const response = await categoryApiClient.put(CATEGORY_ENDPOINTS.UPDATE_CATEGORY(id), categoryData);
+      
+      // Đảm bảo API client được cấu hình đúng
+      ensureConfigured(rootState);
+        
+      const response = await categoryApiClient.put(CATEGORY_ENDPOINTS.UPDATE_CATEGORY(id), categoryData);
       
       if (response.data && response.data.category) {
         commit('UPDATE_CATEGORY', response.data.category);
@@ -137,10 +160,14 @@ const actions = {
   },
   
   // Delete a category
-  async deleteCategory({ commit }, id) {
+  async deleteCategory({ commit, rootState }, id) {
     try {
       commit('SET_LOADING', true);
-        await categoryApiClient.delete(CATEGORY_ENDPOINTS.DELETE_CATEGORY(id));
+      
+      // Đảm bảo API client được cấu hình đúng
+      ensureConfigured(rootState);
+        
+      await categoryApiClient.delete(CATEGORY_ENDPOINTS.DELETE_CATEGORY(id));
       
       commit('REMOVE_CATEGORY', id);
       return true;

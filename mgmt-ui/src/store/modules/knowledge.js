@@ -1,4 +1,11 @@
-import knowledgeApiClient, { KNOWLEDGE_ENDPOINTS } from '../../config/knowledgeApi';
+import knowledgeApiClient, { KNOWLEDGE_ENDPOINTS, configureKnowledgeApi } from '../../config/knowledgeApi';
+
+// Helper function to ensure API client is configured before every request
+const ensureConfigured = (rootState) => {
+  if (rootState.auth && rootState.auth.token) {
+    configureKnowledgeApi(rootState.auth.token);
+  }
+};
 
 const state = {
   knowledgeItems: [],
@@ -16,11 +23,13 @@ const getters = {
 
 const actions = {
   // Fetch all knowledge items
-  async fetchKnowledge({ commit }) {
+  async fetchKnowledge({ commit, rootState }) {
     try {
       commit('SET_LOADING', true);
       commit('SET_ERROR', null);
       
+      ensureConfigured(rootState);
+
       const response = await knowledgeApiClient.get(KNOWLEDGE_ENDPOINTS.GET_KNOWLEDGE);
       
       if (response.data && Array.isArray(response.data.knowledgeItems)) {
@@ -44,7 +53,7 @@ const actions = {
   },
   
   // Search knowledge items
-  async searchKnowledge({ commit, dispatch }, searchTerm) {
+  async searchKnowledge({ commit, dispatch, rootState }, searchTerm) {
     if (!searchTerm || searchTerm.trim() === '') {
       return dispatch('fetchKnowledge');
     }
@@ -52,7 +61,9 @@ const actions = {
     try {
       commit('SET_LOADING', true);
       commit('SET_ERROR', null);
-      
+
+      ensureConfigured(rootState);
+
       const response = await knowledgeApiClient.get(KNOWLEDGE_ENDPOINTS.SEARCH_KNOWLEDGE(searchTerm));
       
       if (response.data && Array.isArray(response.data.knowledgeItems)) {
@@ -75,10 +86,12 @@ const actions = {
     }
   },
     // Create new knowledge item
-  async createKnowledge({ commit, dispatch }, knowledge) {
+  async createKnowledge({ commit, dispatch, rootState }, knowledge) {
     try {
       commit('SET_LOADING', true);
       
+      ensureConfigured(rootState);
+
       const response = await knowledgeApiClient.post(KNOWLEDGE_ENDPOINTS.CREATE_KNOWLEDGE, knowledge);
       
       if (response.data && response.data.success) {
@@ -121,10 +134,12 @@ const actions = {
   },
   
   // Update existing knowledge item
-  async updateKnowledge({ commit, dispatch }, knowledge) {
+  async updateKnowledge({ commit, dispatch, rootState }, knowledge) {
     try {
       commit('SET_LOADING', true);
       
+      ensureConfigured(rootState);
+
       const response = await knowledgeApiClient.put(KNOWLEDGE_ENDPOINTS.UPDATE_KNOWLEDGE(knowledge.id), knowledge);
         if (response.data && response.data.knowledge) {
         commit('UPDATE_KNOWLEDGE_ITEM', response.data.knowledge);
@@ -148,9 +163,11 @@ const actions = {
   },
   
   // Delete knowledge item
-  async deleteKnowledge({ commit, dispatch }, id) {
+  async deleteKnowledge({ commit, dispatch, rootState }, id) {
     try {
       commit('SET_LOADING', true);
+
+      ensureConfigured(rootState);
       
       await knowledgeApiClient.delete(KNOWLEDGE_ENDPOINTS.DELETE_KNOWLEDGE(id));
         commit('REMOVE_KNOWLEDGE_ITEM', id);
