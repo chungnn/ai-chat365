@@ -47,3 +47,12 @@ yarn-error.log*
 
 # debug
 debug.log
+
+# Keys and certificates
+*.pem
+*.key
+*.pub
+*.cert
+*/src/config/keys/*.js
+*/src/config/keys/*
+**/config/keys/
