@@ -2,24 +2,44 @@ const Chat = require('../models/Chat');
 const mongoose = require('mongoose');
 const Tag = require('../models/Tag');
 
-// Get all chats for admin dashboard
+// Get all chats for admin dashboard with IAM policy-based filtering
 exports.getAllChats = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const isResolved = req.query.isResolved === 'true';
     
-    // Build query
-    const query = {
-      // isTransferredToAgent: true,
-      // isAgentResolved: isResolved
+    // Build base query from request params
+    const baseQuery = {};
+    
+    // Apply resolved filter if specified
+    if (req.query.isResolved !== undefined) {
+      baseQuery.isAgentResolved = isResolved;
+    }
+    
+    // Apply category filter if specified
+    if (req.query.category) {
+      baseQuery.category = req.query.category;
+    }
+    
+    // Apply status filter if specified
+    if (req.query.status) {
+      baseQuery.status = req.query.status;
+    }
+    
+    // Combine baseQuery with policy-based query from IAM authorization
+    const finalQuery = {
+      ...baseQuery,
+      ...(req.policyQuery || {}) // Apply row-level security from IAM policies
     };
+
+    console.log('finalQuery', JSON.stringify(finalQuery, null, 4));
     
     // Paginate results
     const skip = (parseInt(page) - 1) * parseInt(limit);
     
     // Find chats with pagination, populate tags, and project only necessary fields
     const chats = await Chat.aggregate([
-      { $match: query },
+      { $match: finalQuery },
       { $sort: { createdAt: -1, lastAgentResponse: 1 } },
       { $skip: skip },
       { $limit: parseInt(limit) },
@@ -37,8 +57,8 @@ exports.getAllChats = async (req, res) => {
     // Populate tags for each chat
     await Chat.populate(chats, { path: 'tags' });
     
-    // Count total chats
-    const totalChats = await Chat.countDocuments(query);
+    // Count total chats that match the query
+    const totalChats = await Chat.countDocuments(finalQuery);
     
     res.status(200).json({
       message: 'Chats retrieved successfully',

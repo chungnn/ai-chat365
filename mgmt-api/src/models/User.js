@@ -35,9 +35,28 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
+    enum: ['user', 'admin', 'manager'],
     default: 'user'
   },
+  teams: [{
+    teamId: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'Team' 
+    },
+    role: { 
+      type: String, 
+      enum: ['member', 'lead', 'manager'], 
+      default: 'member' 
+    },
+    joinedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  iamPolicies: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'IAMPolicy'
+  }],
   isActive: {
     type: Boolean,
     default: true
@@ -75,6 +94,16 @@ UserSchema.pre('save', async function(next) {
 UserSchema.methods.comparePassword = async function(plainPassword) {
   // Trực tiếp so sánh mật khẩu đã nhập với mật khẩu đã hash trong database
   return await bcrypt.compare(plainPassword, this.password);
+};
+
+// Method to populate teams
+UserSchema.methods.populateTeams = async function() {
+  return await User.findById(this._id)
+    .populate({
+      path: 'teams.teamId',
+      model: 'Team',
+      select: 'name description categories iamPolicies'
+    });
 };
 
 // Method to generate auth token using RS256 algorithm

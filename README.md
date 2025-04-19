@@ -100,10 +100,8 @@ The AI Helpdesk Support System features a sophisticated knowledge management sys
 - Automated content categorization
 - Performance analytics on knowledge base usage
 
-## Recent Updates
-- **Enhanced Security**: Implemented RS256 JWT authentication using RSA key pairs for more secure token generation and validation
-- **Multi-language Support**: Added comprehensive internationalization (i18n) throughout the application, with initial support for English and Vietnamese languages
-- **Improved UI Components**: Refactored UI components to use translation keys instead of hard-coded text
+## TODO: 
+- **TODO**: Improve LLM response efficiency by only proceeding with context retrieval when there's an actual question
 
 ## Contributing
 This is an open source project and contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
