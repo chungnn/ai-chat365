@@ -32,7 +32,11 @@ exports.getAllChats = async (req, res) => {
       ...(req.policyQuery || {}) // Apply row-level security from IAM policies
     };
 
-    console.log('finalQuery', JSON.stringify(finalQuery, null, 4));
+    if(finalQuery.userId) {
+      finalQuery.userId = new mongoose.Types.ObjectId(finalQuery.userId);
+    }
+
+    console.log('finalQuery', finalQuery);
     
     // Paginate results
     const skip = (parseInt(page) - 1) * parseInt(limit);

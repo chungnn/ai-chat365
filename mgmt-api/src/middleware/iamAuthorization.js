@@ -2,16 +2,17 @@ const User = require('../models/User');
 const IAMPolicy = require('../models/IAMPolicy'); // Explicitly require the IAM Policy model
 const { evaluatePolicies } = require('../utils/iam/policyEvaluator');
 const { buildQueryFromPolicies } = require('../utils/iam/policyToQuery');
+const { parseUrnToMongoQuery } = require('../utils/iam/urnParser');
 
 /**
- * Chuyển đổi resource path thành ARN
+ * Chuyển đổi resource path thành URN
  * @param {string} service - Tên dịch vụ (chat, kb, team,...)
  * @param {string} resourceType - Loại tài nguyên
  * @param {string} resourcePath - Đường dẫn tài nguyên
- * @returns {string} - ARN
+ * @returns {string} - URN
  */
-function buildARN(service, resourceType, resourcePath) {
-  return `arn:${service}:${resourceType}:*:${resourcePath}`;
+function buildURN(service, resourceType, resourcePath) {
+  return `urn:${service}:${resourceType}:*:${resourcePath}`;
 }
 
 /**
@@ -60,7 +61,7 @@ function buildQueryFromPoliciesMiddleware(action, resourceType) {
       };
       
 
-      console.log('context', context)
+      console.log('policies', policies)
 
       // Thêm các params vào context
       if (req.params) {
@@ -74,18 +75,52 @@ function buildQueryFromPoliciesMiddleware(action, resourceType) {
         Object.entries(req.query).forEach(([key, value]) => {
           context[`request.query.${key}`] = value;
         });
+      }      // Chỉ xử lý URN policy, không sử dụng policy truyền thống
+      let policyQuery = {};
+      const urnQueries = [];
+      
+      for (const policy of policies) {
+        if (!policy.statement) continue;
+        
+        for (const statement of policy.statement) {
+          // Kiểm tra action
+          const actionMatch = statement.action.some(policyAction => {
+            const pattern = policyAction.replace(/\*/g, '.*').replace(/\?/g, '.');
+            const regex = new RegExp(`^${pattern}$`);
+            return regex.test(action);
+          });
+          
+          if (!actionMatch) continue;
+          console.log('context', context)
+          console.log('statement', statement)
+
+          // Xử lý URN resources
+          if (statement.resource && statement.effect === 'Allow') {
+            for (const resource of statement.resource) {
+              // Chỉ xử lý resource có dạng URN
+              if (resource !== '*' && resource.startsWith('urn:')) {
+                const urnQuery = parseUrnToMongoQuery(resource, context);
+                console.log('urnQuery', urnQuery)
+                if (Object.keys(urnQuery).length > 0) {
+                  urnQueries.push(urnQuery);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      
+      
+      // Xây dựng policyQuery từ các urnQueries
+      if (urnQueries.length > 0) {
+        if (urnQueries.length === 1) {
+          policyQuery = urnQueries[0];
+        } else {
+          policyQuery = { $or: urnQueries };
+        }
       }
       
-      // Xây dựng query từ policies
-      const policyQuery = buildQueryFromPolicies(policies, action, resourceType, context);
-      
-      // Nếu không có quyền
-      if (policyQuery === null) {
-        return res.status(403).json({ 
-          success: false, 
-          message: `You don't have permission to ${action} on ${resourceType}` 
-        });
-      }
       
       // Gắn policyQuery vào request để sử dụng trong controller
       req.policyQuery = policyQuery;
@@ -170,6 +205,6 @@ function checkIAMPermission(action, resourceResolver) {
 
 module.exports = { 
   checkIAMPermission, 
-  buildARN,
+  buildURN,
   buildQueryFromPoliciesMiddleware 
 };

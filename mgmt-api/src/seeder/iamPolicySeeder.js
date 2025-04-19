@@ -37,8 +37,7 @@ async function seedPolicies() {
           }
         ]
       },
-      
-      // 2. Chat Admin Policy - Quyền quản lý chỉ phần chat
+        // 2. Chat Admin Policy - Quyền quản lý chỉ phần chat
       {
         name: 'ChatAdminPolicy',
         description: 'Quyền quản lý chỉ dành cho phần chat',
@@ -48,29 +47,28 @@ async function seedPolicies() {
           {
             effect: 'Allow',
             action: ['chat:*'],
-            resource: ['arn:chat:*:*:*']
+            resource: ['urn:chat:*:*:*']
           },
           {
             effect: 'Allow',
             action: ['tag:*'],
-            resource: ['arn:tag:*:*:*']
+            resource: ['urn:tag:*:*:*']
           },
           {
             effect: 'Allow',
             action: ['user:View'],
-            resource: ['arn:user:*:*:*']
+            resource: ['urn:user:*:*:*']
           },
           {
             effect: 'Allow',
             action: ['team:View', 'team:List'],
-            resource: ['arn:team:*:*:*']
+            resource: ['urn:team:*:*:*']
           },
           {
             effect: 'Allow',
             action: ['category:View', 'category:List'],
-            resource: ['arn:category:*:*:*']
-          },
-          {
+            resource: ['urn:category:*:*:*']
+          },          {
             effect: 'Deny',
             action: [
               'user:Create', 'user:Update', 'user:Delete',
@@ -82,47 +80,28 @@ async function seedPolicies() {
           }
         ]
       },
-      
-      // 3. Team Manager Policy - Quyền quản lý team
+        // 3. Team Manager Policy - Quyền quản lý team
       {
         name: 'TeamManagerPolicy',
         description: 'Quyền quản lý chỉ trong phạm vi team',
         isSystemPolicy: true,
         version: '2023-01-01',
-        statement: [
-          {
+        statement: [          {
             effect: 'Allow',
             action: ['chat:*'],
-            resource: ['arn:chat:*:*:*'],
-            condition: [
-              {
-                type: 'BelongsTo',
-                field: 'assignedTeam',
-                value: '${context:user.teamIds}'
-              }
-            ]
-          },
-          {
+            resource: ['urn:chat:team:${context:user.teamIds}:*']
+          },          {
             effect: 'Allow',
             action: ['team:View', 'team:List', 'team:Update'],
-            resource: ['arn:team:*:*:*'],
-            condition: [
-              {
-                type: 'StringEquals',
-                field: '_id',
-                value: '${context:user.teamIds}'
-              }
-            ]
+            resource: ['urn:team:${context:user.teamIds}:*:*']
           },
-          {
-            effect: 'Allow',
+          {            effect: 'Allow',
             action: ['user:View', 'user:List'],
-            resource: ['arn:user:*:*:*']
+            resource: ['urn:user:*:*:*']
           },
           {
             effect: 'Allow',
-            action: ['kb:View', 'kb:List'],
-            resource: ['arn:kb:*:*:*']
+            action: ['kb:View', 'kb:List'],            resource: ['urn:kb:*:*:*']
           }
         ]
       },
@@ -133,34 +112,19 @@ async function seedPolicies() {
         description: 'Quyền cơ bản cho nhân viên hỗ trợ',
         isSystemPolicy: true,
         version: '2023-01-01',
-        statement: [
-          {
+        statement: [          {
             effect: 'Allow',
             action: ['chat:View', 'chat:List', 'chat:Reply'],
-            resource: ['arn:chat:*:*:*'],
-            condition: [
-              {
-                type: 'MongoExpression',
-                field: '$or',
-                value: [
-                  { 'assignedAgent': '${context:user.id}' },
-                  { 
-                    'assignedTeam': { '$in': '${context:user.teamIds}' },
-                    'assignedAgent': { '$exists': false }
-                  }
-                ]
-              }
-            ]
-          },
-          {
+            resource: ['urn:chat:agent:${context:user.id}:*', 'urn:chat:team:${context:user.teamIds}:*']
+          },{
             effect: 'Allow',
             action: ['kb:View', 'kb:List'],
-            resource: ['arn:kb:*:*:*']
+            resource: ['urn:kb:*:*:*']
           },
           {
             effect: 'Deny',
             action: ['chat:Delete'],
-            resource: ['arn:chat:*:*:*']
+            resource: ['urn:chat:*:*:*']
           }
         ]
       }
