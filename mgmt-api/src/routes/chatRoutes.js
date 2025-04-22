@@ -14,7 +14,7 @@ router.get('/', buildQueryFromPoliciesMiddleware('chat:List', 'chat'), chatContr
 // Apply IAM authorization for specific operations
 const chatResourceResolver = (req) => buildURN('chat', 'message', req.params.id || '*');
 
-router.get('/:id', checkIAMPermission('chat:Get', chatResourceResolver), chatController.getChatById);
+router.get('/:id', checkIAMPermission('chat:Get', chatResourceResolver), buildQueryFromPoliciesMiddleware('chat:List', 'chat'), chatController.getChatById);
 router.post('/:id/assign', checkIAMPermission('chat:Assign', chatResourceResolver), chatController.assignChat);
 router.post('/:id/message', checkIAMPermission('chat:SendMessage', chatResourceResolver), chatController.sendMessage);
 router.post('/:id/reply', checkIAMPermission('chat:Reply', chatResourceResolver), chatController.replyToChat);

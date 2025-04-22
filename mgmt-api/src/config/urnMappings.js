@@ -21,9 +21,9 @@ const urnConfiguration = {
         // 'team': {
         //   'assignedTeam': { $in: ['$value'] }
         // },
-        // 'conversation': {
-        //   '_id': '$value'
-        // }
+        'message': {
+          '_id': '$value'
+        }
       },
       // Cấu hình cho accountId trong chat service
       accountIds: {

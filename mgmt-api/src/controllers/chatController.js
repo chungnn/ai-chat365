@@ -91,11 +91,27 @@ exports.getChatById = async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Find chat by ID
-    const chat = await Chat.findById(id).populate('tags');
+    // Kết hợp query để kiểm tra xem id có thuộc danh sách theo điều kiện của policyQuery không
+    const finalQuery = {
+      _id: id,
+      ...(req.policyQuery || {})
+    };
+    
+    // Chuyển đổi các ID string thành ObjectId nếu cần thiết
+    if (finalQuery.userId) {
+      finalQuery.userId = new mongoose.Types.ObjectId(finalQuery.userId);
+    }
+    if (finalQuery.agentId) {
+      finalQuery.agentId = new mongoose.Types.ObjectId(finalQuery.agentId);
+    }
+    
+    console.log('Detail chat query:', finalQuery);
+
+    // Find chat bằng query kết hợp
+    const chat = await Chat.findOne(finalQuery).populate('tags');
     
     if (!chat) {
-      return res.status(404).json({ message: 'Chat not found' });
+      return res.status(404).json({ message: 'Chat not found or you do not have permission to view it' });
     }
     
     res.status(200).json({
