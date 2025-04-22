@@ -105,7 +105,7 @@ Các điều kiện phân quyền hỗ trợ các toán tử:
       "condition": [
         {
           "type": "StringEquals",
-          "field": "assignedAgent",
+          "field": "agentId",
           "value": "${context:user.id}"
         }
       ]
@@ -199,7 +199,7 @@ Hệ thống tự động chuyển đổi IAM policies thành MongoDB queries đ
   "condition": [
     {
       "type": "StringEquals",
-      "field": "assignedAgent",
+      "field": "agentId",
       "value": "${context:user.id}"
     }
   ]
@@ -209,7 +209,7 @@ Hệ thống tự động chuyển đổi IAM policies thành MongoDB queries đ
 2. **MongoDB Query được chuyển đổi**:
 ```javascript
 // Giả sử userId = "60d5ec9bf682feb01f7a4ef1"
-{ "assignedAgent": "60d5ec9bf682feb01f7a4ef1" }
+{ "agentId": ObjectId("60d5ec9bf682feb01f7a4ef1") }
 ```
 
 ### Ví dụ phức tạp hơn
@@ -253,6 +253,8 @@ Hệ thống tự động chuyển đổi IAM policies thành MongoDB queries đ
 
 ### 1. Agent chỉ thấy chat được gán cho mình
 
+#### Cách 1: Sử dụng condition truyền thống
+
 ```json
 {
   "effect": "Allow",
@@ -265,6 +267,17 @@ Hệ thống tự động chuyển đổi IAM policies thành MongoDB queries đ
       "value": "${context:user.id}"
     }
   ]
+}
+```
+
+#### Cách 2: Sử dụng URN hiện đại
+
+```json
+{
+  "effect": "Allow",
+  "action": ["chat:List", "chat:View", "chat:Reply"],
+  "resource": "urn:chat:*:*:agent/${context:user.id}",
+  // Không cần condition, URN đã chứa đủ điều kiện
 }
 ```
 

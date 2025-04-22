@@ -35,6 +35,9 @@ exports.getAllChats = async (req, res) => {
     if(finalQuery.userId) {
       finalQuery.userId = new mongoose.Types.ObjectId(finalQuery.userId);
     }
+    if(finalQuery.agentId) {
+      finalQuery.agentId = new mongoose.Types.ObjectId(finalQuery.agentId);
+    }
 
     console.log('finalQuery', finalQuery);
     

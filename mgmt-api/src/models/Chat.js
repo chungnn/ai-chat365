@@ -82,6 +82,11 @@ const chatSchema = new mongoose.Schema({
     ref: 'Category',
     default: null
   },
+  agentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   assignedTo: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

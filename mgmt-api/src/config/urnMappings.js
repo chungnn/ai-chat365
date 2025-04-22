@@ -64,6 +64,12 @@ const urnConfiguration = {
             'userId': '$1'
           }
         },
+        {
+          pattern: 'agent/(.*)',
+          mapping: {
+            'agentId': '$1'
+          }
+        },
         // Định nghĩa các path phức tạp hơn
         {
           pattern: 'date/(after|before)-(.*)',
