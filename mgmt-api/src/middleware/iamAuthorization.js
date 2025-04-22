@@ -91,8 +91,6 @@ function buildQueryFromPoliciesMiddleware(action, resourceType) {
           });
           
           if (!actionMatch) continue;
-          console.log('context', context)
-          console.log('statement', statement)
 
           // Xử lý URN resources
           if (statement.resource && statement.effect === 'Allow') {
@@ -185,6 +183,10 @@ function checkIAMPermission(action, resourceResolver) {
         'request.path': req.path,
       };
       
+      // Thêm log trong hàm checkIAMPermission để hiển thị chi tiết
+      console.log("User policies:", JSON.stringify(policies, null, 2));
+      console.log("Resource being accessed:", resource);
+
       // Đánh giá policies
       const allowed = evaluatePolicies(policies, action, resource, context);
       

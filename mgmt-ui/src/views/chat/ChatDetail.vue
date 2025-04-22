@@ -393,8 +393,7 @@ export default {
         });
       }
     };
-    
-    // Auto-assign when dropdown value changes
+      // Auto-assign when dropdown value changes
     const autoAssignToAgent = async () => {
       if (!selectedAgentId.value || assigningChat.value) return;
       
@@ -418,8 +417,8 @@ export default {
         });
         
         // Reset to the previous value if there was an error
-        if (currentChat.value && currentChat.value.assignedTo) {
-          selectedAgentId.value = currentChat.value.assignedTo;
+        if (currentChat.value && currentChat.value.agentId) {
+          selectedAgentId.value = currentChat.value.agentId;
         } else {
           selectedAgentId.value = '';
         }
@@ -427,11 +426,10 @@ export default {
         assigningChat.value = false;
       }
     };
-    
-    // Set the selected agent when the chat data is loaded
+      // Set the selected agent when the chat data is loaded
     const setInitialAssignedAgent = () => {
-      if (currentChat.value && currentChat.value.assignedTo) {
-        selectedAgentId.value = currentChat.value.assignedTo;
+      if (currentChat.value && currentChat.value.agentId) {
+        selectedAgentId.value = currentChat.value.agentId;
       }
     };
 

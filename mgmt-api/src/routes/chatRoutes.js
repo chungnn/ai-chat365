@@ -1,7 +1,7 @@
 const express = require('express');
 const chatController = require('../controllers/chatController');
 const { authenticate } = require('../middleware/auth');
-const { buildQueryFromPoliciesMiddleware, checkIAMPermission, buildARN } = require('../middleware/iamAuthorization');
+const { buildQueryFromPoliciesMiddleware, checkIAMPermission, buildURN } = require('../middleware/iamAuthorization');
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.use(authenticate);
 router.get('/', buildQueryFromPoliciesMiddleware('chat:List', 'chat'), chatController.getAllChats);
 
 // Apply IAM authorization for specific operations
-const chatResourceResolver = (req) => buildARN('chat', 'message', req.params.id || '*');
+const chatResourceResolver = (req) => buildURN('chat', 'message', req.params.id || '*');
 
 router.get('/:id', checkIAMPermission('chat:Get', chatResourceResolver), chatController.getChatById);
 router.post('/:id/assign', checkIAMPermission('chat:Assign', chatResourceResolver), chatController.assignChat);
