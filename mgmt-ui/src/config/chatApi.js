@@ -26,11 +26,11 @@ export const CHAT_ENDPOINTS = {
   GET_CHAT_DETAIL: (chatId) => `/api/chats/${chatId}`,
   ASSIGN_CHAT: (chatId) => `/api/chats/${chatId}/assign`,
   GET_AGENTS: `/api/users?role=agent`,
-  UPDATE_TAGS: (chatId) => `/api/chats/${chatId}/tags`,
-  UPDATE_CATEGORY: (chatId) => `/api/chats/${chatId}/category`,
+  UPDATE_TAGS: (chatId) => `/api/chats/${chatId}/tags`,  UPDATE_CATEGORY: (chatId) => `/api/chats/${chatId}/category`,
   UPDATE_STATUS: (chatId) => `/api/chats/${chatId}/status`,
   UPDATE_PRIORITY: (chatId) => `/api/chats/${chatId}/priority`,
   SEND_REPLY: (chatId) => `/api/chats/${chatId}/reply`,
+  EXTRACT_KNOWLEDGE: (chatId) => `/api/chats/${chatId}/extract-knowledge`,
 };
 
 // Export the API client for use in the chat module

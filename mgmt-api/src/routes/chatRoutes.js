@@ -19,6 +19,7 @@ router.post('/:id/assign', checkIAMPermission('chat:Assign', chatResourceResolve
 router.post('/:id/message', checkIAMPermission('chat:SendMessage', chatResourceResolver), chatController.sendMessage);
 router.post('/:id/reply', checkIAMPermission('chat:Reply', chatResourceResolver), chatController.replyToChat);
 router.post('/:id/close', checkIAMPermission('chat:Close', chatResourceResolver), chatController.closeChat);
+router.post('/:id/extract-knowledge', checkIAMPermission('chat:Extract', chatResourceResolver), chatController.extractKnowledge);
 router.put('/:id/status', checkIAMPermission('chat:UpdateStatus', chatResourceResolver), chatController.updateChatStatus);
 router.put('/:id/tags', checkIAMPermission('chat:UpdateTags', chatResourceResolver), chatController.updateChatTags);
 router.put('/:id/category', checkIAMPermission('chat:UpdateCategory', chatResourceResolver), chatController.updateChatCategory);

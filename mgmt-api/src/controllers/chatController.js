@@ -537,3 +537,57 @@ exports.updateChatPriority = async (req, res) => {
     });
   }
 };
+
+// Extract knowledge from chat messages
+exports.extractKnowledge = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { sessionId } = req.body; // optional, to support older chats
+    
+    // Find chat by ID
+    const chat = await Chat.findById(id);
+    
+    if (!chat) {
+      return res.status(404).json({
+        success: false,
+        message: 'Chat not found'
+      });
+    }
+    
+    // If chat has no messages, return empty array
+    if (!chat.messages || chat.messages.length === 0) {
+      return res.status(200).json({
+        success: true,
+        items: []
+      });
+    }
+    
+    // Filter out system messages and prepare content for AI processing
+    const userAgentMessages = chat.messages.filter(
+      msg => msg.role === 'user' || msg.role === 'agent' || msg.role === 'assistant'
+    );
+    
+    // Combine messages into a single content string for processing
+    const contentToProcess = userAgentMessages
+      .map(msg => `${msg.role.toUpperCase()}: ${msg.content}`)
+      .join('\n\n');
+      
+    // Use the AI service to extract knowledge items
+    const aiService = require('../services/aiService');
+    const extractedItems = await aiService.extractKnowledgeItems(contentToProcess, 
+      `Chat with ${chat.userInfo?.name || 'Anonymous'} on ${new Date(chat.createdAt).toLocaleDateString()}`);
+    
+    res.status(200).json({
+      success: true,
+      items: extractedItems
+    });
+    
+  } catch (error) {
+    console.error('Error extracting knowledge:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to extract knowledge',
+      error: process.env.NODE_ENV === 'development' ? error.message : {}
+    });
+  }
+};

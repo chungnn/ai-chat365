@@ -88,10 +88,19 @@
         </div>
       </div>
 
-      <!-- Right column: Admin tools -->
-      <div class="admin-tools">
+      <!-- Right column: Admin tools -->      <div class="admin-tools">
         <div class="tools-section">
-          <h3 class="tools-title">{{ t('chatDetail.chatTools') }}</h3>
+          <div class="tools-header">
+            <h3 class="tools-title">{{ t('chatDetail.chatTools') }}</h3>
+            <button 
+              @click="showKnowledgeModal = true" 
+              class="btn btn-sm btn-primary distill-button"
+              :disabled="!currentChat || !currentChat.messages || currentChat.messages.length === 0"
+              :title="t('chatDetail.distillHelp')"
+            >
+              {{ t('knowledge.distill') }}
+            </button>
+          </div>
             <!-- Assignment section (updated) -->
           <div class="tool-card">
             <h4 class="tool-header">{{ t('chatDetail.assignChat') }}</h4>            <div class="tool-content">
@@ -218,6 +227,14 @@
         </div>
       </div>
     </div>
+      <!-- Knowledge Extraction Modal -->
+    <knowledge-extraction-modal
+      :show="showKnowledgeModal"
+      :chat-id="currentChat?._id || ''"
+      :session-id="sessionId"
+      @close="showKnowledgeModal = false"
+      @saved="onKnowledgeSaved"
+    />
   </div>
 </template>
 
@@ -227,12 +244,14 @@ import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import UrlPreview from '@/components/common/UrlPreview.vue';
+import KnowledgeExtractionModal from '@/components/knowledge/KnowledgeExtractionModal.vue';
 import { parseMarkdown } from '@/utils/markdown';
 
 export default {
   name: 'ChatDetailView',
   components: {
-    UrlPreview
+    UrlPreview,
+    KnowledgeExtractionModal
   },
     setup() {
     const store = useStore();
@@ -261,6 +280,15 @@ export default {
     const allTags = ref([]);
     const tagSearchQuery = ref('');
     const showTagDropdown = ref(false);
+    
+    // For knowledge extraction
+    const showKnowledgeModal = ref(false);
+    
+    // Method for handling successfully saved knowledge
+    const onKnowledgeSaved = (results) => {
+      console.log('Knowledge items saved:', results);
+      // You could do something with the results here if needed
+    };
     
     // Filter tags based on search query
     const filteredTags = computed(() => {
@@ -777,6 +805,11 @@ export default {
       selectedPriority,
       savingPriority,
       updatePriority,
+      // Knowledge extraction
+      showKnowledgeModal,
+      onKnowledgeSaved,
+      // Session ID for socket communication
+      sessionId,
       // Add the t function for i18n
       t
     };
@@ -882,13 +915,24 @@ export default {
   padding: 10px 5px;
 }
 
+.tools-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #cbd5e1;
+  padding-bottom: 8px;
+}
+
 .tools-title {
   font-size: 16px;
-  margin: 0 0 10px 0;
+  margin: 0;
   color: #1d2537;
-  text-align: center;
-  padding-bottom: 8px;
-  border-bottom: 1px dashed #cbd5e1;
+}
+
+.distill-button {
+  font-size: 12px;
+  padding: 4px 8px;
 }
 
 .tool-card {

@@ -263,14 +263,22 @@ export default {  common: {
     contentPlaceholder: 'Enter knowledge content...',
     contentDescription: 'Knowledge content (title will be automatically extracted)',
     contentEditDescription: 'Knowledge content',
-    titlePlaceholder: 'Enter knowledge title...',
-    updated: 'Updated',
+    titlePlaceholder: 'Enter knowledge title...',    updated: 'Updated',
     add: 'Add',
     update: 'Update',
     cancel: 'Cancel',
-    delete: 'Delete'
+    delete: 'Delete',
+    distill: 'Distill',
+    extractedKnowledge: 'Extracted Knowledge',
+    extracting: 'Extracting knowledge...',
+    noExtractedItems: 'No knowledge could be extracted from this conversation.',
+    extractionError: 'An error occurred while extracting knowledge.',
+    saveAll: 'Save All',
+    saving: 'Saving...',
+    savedSuccessfully: '{count} knowledge items saved successfully',
+    savingError: 'An error occurred while saving knowledge.'
   },
-  // Add chat detail translations
+  // Add chat detail translations  
   chatDetail: {
     backToChats: 'Back to Chats',
     chatWith: 'Chat with',
@@ -283,6 +291,8 @@ export default {  common: {
     chatTools: 'Chat Tools',
     assignChat: 'Assign Chat',
     selectAgent: 'Select Agent',
+    distillHelp: 'Extract knowledge from this conversation to save in the knowledge base.',
+    distillNoMessages: 'No messages to extract knowledge from.',
     assigning: 'Assigning...',
     classification: 'Classification',
     selectCategory: 'Select Category',

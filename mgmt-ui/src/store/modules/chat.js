@@ -237,6 +237,35 @@ const actions = {
       commit('SET_LOADING', false);
     }
   },
+  // Extract knowledge from chat
+  async extractKnowledge({ commit, rootState }, { chatId, sessionId }) {
+    try {
+      commit('SET_LOADING', true);
+      
+      // Ensure API client is configured
+      if (rootState.auth.token) {
+        configureChatApi(rootState.auth.token);
+      }
+      
+      const response = await chatApiClient.post(CHAT_ENDPOINTS.EXTRACT_KNOWLEDGE(chatId), {
+        sessionId  // Include sessionId if available
+      });
+      
+      if (response.data && response.data.items) {
+        return response.data.items;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error extracting knowledge:', error);
+      commit('SET_ERROR', 'Failed to extract knowledge');
+      throw error;
+    } finally {
+      commit('SET_LOADING', false);
+    }
+  },
   // Assign chat to an agent
   async assignChat({ commit, rootState }, { chatId, agentId }) {
     try {

@@ -39,8 +39,9 @@ const getGeminiModel = () => {
     try {
       const ai = getGeminiAI();
       // Get the Gemini model using config settings
-      geminiModel = ai.getGenerativeModel({ model: config.geminiAI.model });
-      console.log('Gemini model initialized successfully');
+      const modelName = config.geminiAI.model || 'gemini-2.0-flash';
+      geminiModel = ai.getGenerativeModel({ model: modelName });
+      console.log(`Gemini model initialized successfully with model: ${modelName}`);
     } catch (error) {
       console.error('Error initializing Gemini model:', error);
       throw error;
@@ -85,41 +86,46 @@ Hãy trả lời câu hỏi kỹ thuật của người dùng một cách ngắn
     const systemInstruction = systemInstructions[locale] || systemInstructions.en;
     
     // Convert conversation history to Gemini format
-    let formattedHistory = [];
-    
-    // Check if there are previous messages to include in history
+    let formattedHistory = [];    // Check if there are previous messages to include in history
     if (messages.length > 1) {
-      // Get the last 10 messages, excluding the current message
-      const recentMessages = messages.slice(-11, -1);
+      // Get messages, excluding the current message (max 15 previous messages for context)
+      const historyLimit = 15; // Increase history limit for better context
+      let recentMessages = messages.slice(-historyLimit-1, -1);
       
-      // Find index of first user message
-      let firstUserIndex = 2; // luôn cắt bỏ 2 message đầu tiên do setup hệ thống
-      for (let i = 0; i < recentMessages.length; i++) {
-        if (recentMessages[i].role === 'user') {
-          firstUserIndex = i;
-          break;
-        }
+      // Loại bỏ 2 tin nhắn đầu tiên do setup hệ thống
+      if (recentMessages.length >= 2) {
+        recentMessages = recentMessages.slice(2);
       }
-      
-      // If we found a user message, only include messages from that point onward
-      const filteredMessages =  recentMessages.slice(firstUserIndex);
       
       // Format past messages for history (including both user and assistant messages)
-      for (const msg of filteredMessages) {
-        let r = msg.role === 'assistant' ? 'model' :  msg.role;
-        formattedHistory.push({
-          role: r,
-          parts: [{ text: msg.content }]
-        });
+      for (const msg of recentMessages) {
+        // Map standard role names to Gemini's expected format (user stays as "user", assistant becomes "model")
+        const role = msg.role === 'assistant' ? 'model' : msg.role;
+        
+        // Only include valid roles: 'user' or 'model'
+        if (role === 'user' || role === 'model') {
+          formattedHistory.push({
+            role: role,
+            parts: [{ text: msg.content }]
+          });
+        }
       }
 
-      console.log('formattedHistory', JSON.stringify(formattedHistory, null, 2));
+      console.log(`Chat history processed: ${formattedHistory.length} messages included`);
+      
+      // Log a sample of history for debugging (first and last message)
+      if (formattedHistory.length > 0) {
+        console.log('First history message:', formattedHistory[0].role, formattedHistory[0].parts[0].text.substring(0, 50) + '...');
+        if (formattedHistory.length > 1) {
+          const last = formattedHistory.length - 1;
+          console.log('Last history message:', formattedHistory[last].role, formattedHistory[last].parts[0].text.substring(0, 50) + '...');
+        }
+      }
     }
     
     // Get language-specific prompt template based on the locale
     const promptTemplates = require('../config/promptTemplates');
-    const promptTemplate = promptTemplates[locale] || promptTemplates.en;
-      // ****** TÌM KIẾM TRONG CƠ SỞ TRI THỨC ELASTICSEARCH ******
+    const promptTemplate = promptTemplates[locale] || promptTemplates.en;    // ****** TÌM KIẾM TRONG CƠ SỞ TRI THỨC ELASTICSEARCH ******
     // Tìm thông tin liên quan từ cơ sở tri thức Elasticsearch
     console.log('Tìm kiếm thông tin liên quan từ Elasticsearch cho:', latestUserMessage);
     let knowledgeContext = null;
@@ -131,19 +137,23 @@ Hãy trả lời câu hỏi kỹ thuật của người dùng một cách ngắn
       // Kiểm tra kết nối Elasticsearch trước khi tìm kiếm
       const connectionStatus = await elasticsearchRagService.verifyElasticsearchConnection();
       if (connectionStatus.connected && connectionStatus.indexExists) {
+        // Thử lấy thông tin liên quan từ vector search
         knowledgeContext = await elasticsearchRagService.getRelevantInformation(latestUserMessage);
-        console.log('Thông tin liên quan từ Elasticsearch:', knowledgeContext ? 'Tìm thấy' : 'Không tìm thấy');
-      } else {
-        console.warn('Elasticsearch không khả dụng, trạng thái:', connectionStatus);
         
-        // Fallback sang ragService nếu Elasticsearch không khả dụng
-        console.log('Fallback sang file-based RAG...');
-        const ragService = require('./ragService');
-        knowledgeContext = await ragService.getRelevantInformation(latestUserMessage);
-        console.log('Thông tin liên quan từ file-based RAG:', knowledgeContext ? 'Tìm thấy' : 'Không tìm thấy');
+        // Ghi log chi tiết hơn
+        if (knowledgeContext) {
+          const snippetLength = Math.min(knowledgeContext.length, 100);
+          console.log(`Thông tin liên quan từ Elasticsearch: Tìm thấy ${knowledgeContext.length} ký tự`);
+          console.log(`Đoạn đầu: ${knowledgeContext.substring(0, snippetLength)}...`);
+        } else {
+          console.log('Không tìm thấy thông tin liên quan từ Elasticsearch');
+        }
+      } else {
+        console.log('Elasticsearch không khả dụng hoặc không tìm thấy chỉ mục');
       }
     } catch (error) {
       console.error('Lỗi khi tìm kiếm thông tin trong cơ sở tri thức:', error);
+      console.error(error.stack); // Ghi log stack trace để debug tốt hơn
     }
     
     // Tạo tin nhắn cho người dùng với lời nhắc hệ thống và mẫu ngôn ngữ phù hợp
@@ -168,15 +178,17 @@ Hãy trả lời câu hỏi kỹ thuật của người dùng một cách ngắn
     
     // Get the Gemini model instance using our singleton pattern
     const model = getGeminiModel();
+      // Read generation configuration from config if available, or use defaults
+    const generationConfig = config.geminiAI?.generationConfig || {
+      temperature: 0.7,
+      maxOutputTokens: 1000, // Increased token limit for more comprehensive responses
+      topP: 0.95,
+      topK: 40,
+    };
     
     // Create the chat instance with history
     const chat = model.startChat({
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 800,
-        topP: 0.95,
-        topK: 40,
-      },
+      generationConfig,
       safetySettings: [
         {
           category: "HARM_CATEGORY_HARASSMENT",
@@ -198,11 +210,38 @@ Hãy trả lời câu hỏi kỹ thuật của người dùng một cách ngắn
       history: formattedHistory
     });
     
-    // Send the user message to Gemini and get response    
-    const result = await chat.sendMessage(userMessage.parts[0].text);
-    const response = result.response.text();
-    console.log('Gemini response:', response);
-    return response;
+    console.log('Sending message to Gemini with:', {
+      historyLength: formattedHistory.length,
+      hasKnowledgeContext: !!knowledgeContext,
+      userMessageLength: userMessage.parts[0].text.length,
+      temperature: generationConfig.temperature,
+      maxTokens: generationConfig.maxOutputTokens
+    });
+    
+    // Send the user message to Gemini and get response with timeout handling
+    const timeoutDuration = 30000; // 30 seconds timeout
+    let result;
+    
+    try {
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("LLM request timed out")), timeoutDuration);
+      });
+      
+      result = await Promise.race([
+        chat.sendMessage(userMessage.parts[0].text),
+        timeoutPromise
+      ]);
+      
+      const response = result.response.text();
+      console.log('Gemini response received:', response.substring(0, 100) + '...');
+      return response;
+    } catch (error) {
+      if (error.message === "LLM request timed out") {
+        console.error('Gemini request timed out after', timeoutDuration, 'ms');
+        throw new Error('Request to AI service timed out. Please try again.');
+      }
+      throw error; // Re-throw other errors to be caught by the outer try-catch
+    }
   } catch (error) {
     console.error('Error generating Gemini response:', error);
     // Use translation instead of hardcoded Vietnamese
