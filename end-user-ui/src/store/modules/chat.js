@@ -38,6 +38,7 @@ const getters = {
   isTransferredToAgent: state => state.isTransferredToAgent,
   waitingForAgent: state => state.waitingForAgent,
   isTransferring: state => state.isTransferring,
+  getPseudoId: state => localStorage.getItem('pseudo_id') || null,
   
   // Getters for helpdesk functionality
   getTicketId: state => state.ticketId,
@@ -392,6 +393,7 @@ const actions = {
     try {
       // Lấy sessionId từ localStorage hoặc state
       const sessionId = getters.getSessionId;
+      const pseudoId = getters.getPseudoId;
       
       // Đảm bảo có sessionId trước khi gửi tin nhắn
       if (!sessionId) {
@@ -429,7 +431,8 @@ const actions = {
           sessionId,
           message: messageContent,
           userId: userId,
-          timestamp: new Date()
+          timestamp: new Date(),
+          pseudoId: pseudoId
         };
         
         socket.emit('send_message', messageData);

@@ -1,6 +1,8 @@
 const Chat = require('../models/Chat');
 const aiService = require('./aiService');
 const analyticsService = require('./analyticsService');
+const TokenUsage = require('../models/TokenUsage');
+const tokenService = require('./tokenService');
 
 /**
  * Initialize and configure the Socket.IO service
@@ -26,7 +28,7 @@ const initializeSocketService = (io) => {
     socket.on('send_message', async (data) => {
       console.log('[SOCKET DEBUG] Message received via socket:', JSON.stringify(data, null, 2));
       try {
-        const { sessionId, message, userId, timestamp } = data;
+        const { sessionId, message, userId, timestamp, pseudoId } = data;
 
         if (!sessionId || !message) {
           console.log('[SOCKET DEBUG] Error: Missing sessionId or message');
@@ -100,61 +102,79 @@ const initializeSocketService = (io) => {
         // No product suggestions in simplified version
         let productSuggestions = [];
 
-        // Generate AI response
-        console.log('[SOCKET DEBUG] Generating AI response');
-        const aiResponse = await aiService.generateResponse(messagesForAI);
-        console.log('[SOCKET DEBUG] AI Response generated:', aiResponse);
+        
+        const curTokenUsage = await TokenUsage.getTokenUsage(pseudoId, new Date().toISOString().split('T')[0]);
+        if (curTokenUsage && 
+          (curTokenUsage.tokens.user_message > process.env.TOKEN_LIMIT || 
+            curTokenUsage.tokens.ai_response > process.env.TOKEN_LIMIT
+          )) {
+          console.log(`[SOCKET DEBUG] Token usage limit for userId: ${userId}, pseudoId: ${pseudoId}`);
+        } else {
+          // Count tokens used and save to the database
+          const tokenCount = tokenService.calculateTokens(message); 
+          await TokenUsage.updateTokenUsage(userId, pseudoId, new Date().toISOString().split('T')[0], { user_message: tokenCount, ai_response: 0 });
+            
+          // Generate AI response
+          console.log('[SOCKET DEBUG] Generating AI response');
+          const aiResponse = await aiService.generateResponse(messagesForAI);
+          console.log('[SOCKET DEBUG] AI Response generated:', aiResponse);
 
-        // Add AI response to chat history
-        chat.messages.push({
-          role: 'assistant',
-          content: aiResponse
-        });
+          const tokenCountAI = tokenService.calculateTokens(aiResponse); 
+          await TokenUsage.updateTokenUsage(userId, pseudoId, new Date().toISOString().split('T')[0], { user_message: 0, ai_response: tokenCountAI });
 
-        // Check if we should suggest human transfer
-        console.log('[SOCKET DEBUG] Checking if should transfer to human');
-        const shouldSuggestHumanTransfer = await aiService.shouldTransferToHuman(
-          chat.messages.map(msg => ({
-            role: msg.role,
-            content: msg.content
-          }))
-        );
-        console.log('[SOCKET DEBUG] Human transfer suggestion:', JSON.stringify(shouldSuggestHumanTransfer, null, 2));
-
-        // Update the chat session
-        chat.updatedAt = Date.now();
-        await chat.save();
-        console.log(`[SOCKET DEBUG] Chat session updated for sessionId: ${sessionId}`);
-
-        // Send the AI response back to the specific client's room
-        console.log(`[SOCKET DEBUG] Emitting AI response to room: ${sessionId}`);
-        io.to(sessionId).emit('receive_message', {
-          role: 'assistant',
-          content: aiResponse,
-          timestamp: new Date()
-        });
-
-        // Track analytics for the user message
-        analyticsService.trackEvent('chat_message_received', {
-          sessionId,
-          intent: chat.metadata.intent,
-          topics: chat.metadata.topics,
-          isAuthenticated: userId !== 'anonymous'
-        });
-
-        // Add product suggestions if available
-        if (productSuggestions && productSuggestions.length > 0) {
-          console.log('[SOCKET DEBUG] Emitting product suggestions');
-          socket.emit('suggestions', {
-            products: productSuggestions
+          // Add AI response to chat history
+          chat.messages.push({
+            role: 'assistant',
+            content: aiResponse
           });
-        }
 
-        // Suggest human transfer if needed
-        if (shouldSuggestHumanTransfer.shouldTransfer) {
-          console.log('[SOCKET DEBUG] Emitting suggestion for human transfer');
-          socket.emit('suggest_human_transfer', true);
+          // Check if we should suggest human transfer
+          console.log('[SOCKET DEBUG] Checking if should transfer to human');
+          const shouldSuggestHumanTransfer = await aiService.shouldTransferToHuman(
+            chat.messages.map(msg => ({
+              role: msg.role,
+              content: msg.content
+            }))
+          );
+          console.log('[SOCKET DEBUG] Human transfer suggestion:', JSON.stringify(shouldSuggestHumanTransfer, null, 2));
+
+          // Update the chat session
+          chat.updatedAt = Date.now();
+          await chat.save();
+          console.log(`[SOCKET DEBUG] Chat session updated for sessionId: ${sessionId}`);
+
+          // Send the AI response back to the specific client's room
+          console.log(`[SOCKET DEBUG] Emitting AI response to room: ${sessionId}`);
+          io.to(sessionId).emit('receive_message', {
+            role: 'assistant',
+            content: aiResponse,
+            timestamp: new Date()
+          });
+
+          // Track analytics for the user message
+          analyticsService.trackEvent('chat_message_received', {
+            sessionId,
+            intent: chat.metadata.intent,
+            topics: chat.metadata.topics,
+            isAuthenticated: userId !== 'anonymous'
+          });
+
+          // Add product suggestions if available
+          if (productSuggestions && productSuggestions.length > 0) {
+            console.log('[SOCKET DEBUG] Emitting product suggestions');
+            socket.emit('suggestions', {
+              products: productSuggestions
+            });
+          }
+
+          // Suggest human transfer if needed
+          if (shouldSuggestHumanTransfer.shouldTransfer) {
+            console.log('[SOCKET DEBUG] Emitting suggestion for human transfer');
+            socket.emit('suggest_human_transfer', true);
+          }
         }
+        
+        
       } catch (error) {
         console.error('[SOCKET DEBUG] Error processing message via socket:', error);
         socket.emit('error', {

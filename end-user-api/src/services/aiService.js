@@ -92,11 +92,6 @@ Hãy trả lời câu hỏi kỹ thuật của người dùng một cách ngắn
       const historyLimit = 15; // Increase history limit for better context
       let recentMessages = messages.slice(-historyLimit-1, -1);
       
-      // Loại bỏ 2 tin nhắn đầu tiên do setup hệ thống
-      if (recentMessages.length >= 2) {
-        recentMessages = recentMessages.slice(2);
-      }
-      
       // Format past messages for history (including both user and assistant messages)
       for (const msg of recentMessages) {
         // Map standard role names to Gemini's expected format (user stays as "user", assistant becomes "model")
@@ -110,23 +105,23 @@ Hãy trả lời câu hỏi kỹ thuật của người dùng một cách ngắn
           });
         }
       }
-
-      console.log(`Chat history processed: ${formattedHistory.length} messages included`);
-      
-      // Log a sample of history for debugging (first and last message)
-      if (formattedHistory.length > 0) {
-        console.log('First history message:', formattedHistory[0].role, formattedHistory[0].parts[0].text.substring(0, 50) + '...');
-        if (formattedHistory.length > 1) {
-          const last = formattedHistory.length - 1;
-          console.log('Last history message:', formattedHistory[last].role, formattedHistory[last].parts[0].text.substring(0, 50) + '...');
-        }
-      }
     }
+    
+    // Ensure the first message in formattedHistory always has the role 'user'
+    if (formattedHistory.length > 0 && formattedHistory[0].role !== 'user') {
+      formattedHistory.unshift({
+        role: 'user',
+        parts: [{ text: '' }] // Add an empty user message if none exists
+      });
+    }
+
+    console.log("formattedHistory", JSON.stringify(formattedHistory, null, 2));
     
     // Get language-specific prompt template based on the locale
     const promptTemplates = require('../config/promptTemplates');
-    const promptTemplate = promptTemplates[locale] || promptTemplates.en;    // ****** TÌM KIẾM TRONG CƠ SỞ TRI THỨC ELASTICSEARCH ******
-    // Tìm thông tin liên quan từ cơ sở tri thức Elasticsearch
+    const promptTemplate = promptTemplates[locale] || promptTemplates.en;    
+    // ****** TÌM KIẾM TRONG CƠ SỞ TRI THỨC ELASTICSEARCH ******
+ 
     console.log('Tìm kiếm thông tin liên quan từ Elasticsearch cho:', latestUserMessage);
     let knowledgeContext = null;
     

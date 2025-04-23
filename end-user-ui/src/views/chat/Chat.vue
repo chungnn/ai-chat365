@@ -430,6 +430,15 @@ export default {
       try {
         const response = await this.$store.dispatch('chat/sendMessage', message);
         
+        // // Include pseudoId when sending chat messages
+        // this.socket.emit('send_message', {
+        //   sessionId: this.sessionId,
+        //   message,
+        //   userId: this.userInfo.userId || 'anonymous',
+        //   pseudoId: this.pseudoId, // Add pseudoId to the payload
+        //   timestamp: new Date()
+        // });
+
         // Nếu AI đề xuất chuyển sang nhân viên tư vấn
         if (response && response.suggestHumanTransfer) {
           this.showTransferDialog = true;
