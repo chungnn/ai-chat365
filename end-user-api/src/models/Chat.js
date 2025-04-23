@@ -32,6 +32,12 @@ const chatSchema = new mongoose.Schema({
     unique: true,
     index: true
   },
+  pseudoId: {
+    type: String,
+    required: true,
+    unique: true,
+    index: true
+  },
   ticketId: {
     type: String,
     unique: true,

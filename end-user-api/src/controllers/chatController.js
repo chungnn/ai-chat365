@@ -56,7 +56,7 @@ exports.initSession = async (req, res) => {
     const sessionId = providedSessionId || uuidv4();
     
     // Extract user info if provided
-    const { name, email, phone } = req.body;
+    const { name, email, phone, pseudoId } = req.body;
     
     // Track analytics event for new chat session
     analyticsService.trackEvent('chat_session_started', {
@@ -76,6 +76,7 @@ exports.initSession = async (req, res) => {
       status: 'open',
       priority: 'medium',
       category: null,
+      pseudoId: pseudoId || null,
       userInfo: {
         name: name || '',
         email: email || '',

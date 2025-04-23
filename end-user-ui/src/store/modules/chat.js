@@ -344,14 +344,15 @@ const actions = {
     try {
       // Kiểm tra xem đã có sessionId trong localStorage chưa
       const savedSessionId = localStorage.getItem('chat_session_id');
+      const savedPseudoId = localStorage.getItem('pseudo_id');
       let response;
       
       if (savedSessionId) {
         // Nếu có sẵn sessionId, gửi lên server để validate và lấy lịch sử chat
-        response = await axios.post('/chat/session', { sessionId: savedSessionId });
+        response = await axios.post('/chat/session', { sessionId: savedSessionId, pseudoId: savedPseudoId });
       } else {
         // Nếu chưa có, tạo mới sessionId
-        response = await axios.post('/chat/session');
+        response = await axios.post('/chat/session', { pseudoId: savedPseudoId });
       }
       
       if (response.data && response.data.sessionId) {

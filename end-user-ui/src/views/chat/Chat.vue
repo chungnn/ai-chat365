@@ -205,6 +205,7 @@ import UrlPreview from '@/components/chat/UrlPreview.vue';
 import { marked } from 'marked';
 import 'highlight.js/styles/github.css';
 import hljs from 'highlight.js';
+import { v4 as uuidv4 } from 'uuid';
 
 // Configuration de marked pour utiliser highlight.js
 marked.setOptions({
@@ -228,11 +229,18 @@ export default {
     LoadingOverlay,
     UrlPreview
   },data() {
-    // Sử dụng composable useSocket để truy cập các phương thức socket
     const socket = useSocket();
-    
+
+    // Generate or retrieve pseudoId from localStorage
+    let pseudoId = localStorage.getItem('pseudo_id');
+    if (!pseudoId) {
+      pseudoId = uuidv4();
+      localStorage.setItem('pseudo_id', pseudoId);
+    }
+
     return {
       socket,
+      pseudoId, // Add pseudoId to the component's data
       newMessage: '',
       isInitialLoading: false,
       isUpdatingUserInfo: false,
@@ -508,31 +516,25 @@ export default {
     },    async initChat() {
       this.isInitialLoading = true;
       try {
-        // Ensure socket connection is established
         if (this.socket.connectSocket) {
           this.socket.connectSocket();
         }
-        
-        // Gọi action initChat từ store thay vì thực hiện axios trực tiếp
+
         await this.$store.dispatch('chat/initChat');
-        
-        // Join the chat room for real-time updates
+
         if (this.sessionId && this.socket.joinChatRoom) {
           this.socket.joinChatRoom(this.sessionId);
         }
-        
-        // Nếu người dùng đã đăng nhập, cập nhật thông tin vào userInfo và cập nhật lên server
+
         if (this.user && this.sessionId) {
-          console.log('[CHAT DEBUG] Người dùng đã đăng nhập khi khởi tạo chat');
           this.userInfo.name = this.user.firstName + ' ' + this.user.lastName;
           this.userInfo.email = this.user.email;
           this.userInfo.phone = this.user.phoneNumber || '';
           this.userInfo.userId = this.user.id;
-          
-          // Cập nhật thông tin người dùng vào phiên chat
+          this.userInfo.pseudoId = this.pseudoId; // Include pseudoId in userInfo
+
           try {
             await this.$store.dispatch('chat/updateUserInfo', this.userInfo);
-            console.log('[CHAT DEBUG] Đã cập nhật thông tin người dùng trong initChat');
           } catch (updateError) {
             console.error('[CHAT DEBUG] Lỗi cập nhật thông tin người dùng trong initChat:', updateError);
           }
